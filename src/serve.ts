@@ -1,6 +1,6 @@
 import express from "express";
 import { Request, Response } from "express";
-import { RequireAll } from "#src/lib/index";
+import { RequireAll } from "#lib";
 
 /**
  * The possible options you can provide to the `serve` function.

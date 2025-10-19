@@ -1,4 +1,4 @@
-import { RequireAll } from '#src/lib/index';
+import { RequireAll } from '#lib';
 
 /**
  * The possible options you can provide to the `compile` function.

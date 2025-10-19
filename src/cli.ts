@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import pkg from "#package" with { type: "json" };
-import { LogLevel } from "#src/lib/index";
+import { LogLevel } from "#lib";
 import { serve as startServer } from "#src/serve";
 import { compile as compileFile } from "#src/compile";
 import { Command } from "commander";
