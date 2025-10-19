@@ -71,7 +71,7 @@ describe("enum LogLevel", () => {
 
   // Enum options
 
-  test('LogLevel.OPTION === option', () => {
+  test("LogLevel.OPTION === option", () => {
     for (const value of LogLevel.options) {
       const key = value.toUpperCase() as keyof typeof LogLevel;
       expect(LogLevel[key]).toBe(value);
