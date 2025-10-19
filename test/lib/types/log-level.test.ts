@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { LogLevel } from "#src/lib/index";
+import { LogLevel } from "#lib";
 
 describe("enum LogLevel", () => {
   // LogLevel options
