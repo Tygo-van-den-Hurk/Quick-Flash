@@ -1,0 +1,64 @@
+{
+  "name": "quick-flash",
+  "version": "0.0.1",
+  "description": "Make beautifully animated presentations from YAML.",
+  "readme": "readme.md",
+  "private": true,
+  "repository": {
+    "url": "https://github.com/Tygo-van-den-Hurk/${SET_ME}"
+  },
+  "bugs": {
+    "url": "https://github.com/Tygo-van-den-Hurk/${SET_ME}/issues"
+  },
+  "homepage": "https://github.com/Tygo-van-den-Hurk/${SET_ME}",
+  "maintainers": [
+    "Tygo van den Hurk"
+  ],
+  "author": {
+    "name": "Tygo van den Hurk",
+    "url": "https://github.com/Tygo-van-den-Hurk"
+  },
+  "main": "dist/src/cli.js",
+  "scripts": {
+    "start": "node dist/src/cli.js",
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "test": "vitest --dir test run --silent passed-only",
+    "test:watch": "vitest --dir test watch --cache --silent passed-only",
+    "test:coverage": "vitest --dir test run --coverage --silent passed-only",
+    "coverage": "npm run --silent test:coverage",
+    "lint": "npm run --silent lint:check",
+    "lint:check": "eslint '{src,test}/**/*.{js,ts}' --cache --cache-location ./.cache/eslint/",
+    "lint:write": "eslint '{src,test}/**/*.{js,ts}' --cache --cache-location ./.cache/eslint/ --fix",
+    "format": "npm run --silent format:write",
+    "format:check": "prettier '{src,test}/**/*.{js,ts}' --check",
+    "format:write": "prettier '{src,test}/**/*.{js,ts}' --write"
+  },
+  "dependencies": {
+    "commander": "^14.0.1",
+    "express": "^5.1.0",
+    "fast-glob": "^3.3.3",
+    "ts-command-line-args": "^2.5.1",
+    "yaml": "^2.8.1",
+    "zod": "^4.1.12"
+  },
+  "type": "module",
+  "imports": {
+    "#src/*": "./src/*.js",
+    "#package": "./package.json"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.5.2",
+    "@vitest/coverage-v8": "^3.2.4",
+    "esbuild": "^0.25.11",
+    "esbuild-plugin-alias": "^0.2.1",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "jiti": "^2.6.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
