@@ -24,8 +24,8 @@ export namespace LogLevel {
   export function fromNumber(value: number): LogLevel {
     const min = 0;
     if (value < min) value = min;
-    const max = LogLevelOptions.length;
-    if (value > max) value = max - 1;
+    const max = LogLevelOptions.length - 1;
+    if (value > max) value = max;
     return LogLevelOptions[value];
   }
 
