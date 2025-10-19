@@ -1,4 +1,4 @@
-import { RequireAll } from "#src/lib/index";
+import { RequireAll } from "#lib";
 import fs from "fs";
 import path from "path";
 

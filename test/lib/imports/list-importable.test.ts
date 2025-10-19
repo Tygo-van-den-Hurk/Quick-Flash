@@ -1,4 +1,4 @@
-import { listImportable, ListImportableFilesArgs } from "#src/lib/index";
+import { listImportable, ListImportableFilesArgs } from "#lib";
 import { describe, test, expect } from "vitest";
 import { fileURLToPath } from "url";
 import path from "path";

@@ -1,8 +1,8 @@
 import {
   listImportable,
   ListImportableFilesArgs,
-} from "#src/lib/imports/list-importable";
-import { RequireAll } from "#src/lib/index";
+} from "#lib/imports/list-importable";
+import { RequireAll } from "#lib/index";
 
 /**
  * The possible options you can provide to the `importFileRecursively` function, and the helper
