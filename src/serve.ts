@@ -32,7 +32,8 @@ export namespace ServeArgs {
     host: "0.0.0.0",
     callback: (args: RequireAll<ServeArgs>, error?: Error) => {
       if (error) console.error(`Error starting server: ${error.message}`);
-      else console.info(`server started on port http://${args.host}:${args.port}`);
+      else
+        console.info(`server started on port http://${args.host}:${args.port}`);
     },
   } satisfies ServeArgs;
 

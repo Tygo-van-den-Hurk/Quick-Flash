@@ -8,19 +8,19 @@ import { Command } from "commander";
 import FastGlob from "fast-glob";
 import path from "path";
 import fs from "fs";
-import net from 'net';
+import net from "net";
 
 const program = new Command();
 
 /* Setting options for how the CLI should behave */ {
-  program.name(pkg.name);  
+  program.name(pkg.name);
   program.allowUnknownOption(false);
   program.allowExcessArguments(false);
-  program.exitOverride();    
+  program.exitOverride();
   program.version(
-    pkg.version, 
-    "-v, --version", 
-    "print program version and then exit"
+    pkg.version,
+    "-v, --version",
+    "print program version and then exit",
   );
 }
 
@@ -104,11 +104,7 @@ const compile = program
   .action((opts) => compileFile(opts));
 
 /* Adding the 'port' option to the serve command */ {
-  compile.option(
-    "-o, --output <path>",
-    "serve on this port",
-    undefined,
-  );
+  compile.option("-o, --output <path>", "serve on this port", undefined);
 }
 
 const serve = program
@@ -117,21 +113,15 @@ const serve = program
   .action((opts) => startServer(opts));
 
 /* Adding the 'host' option to the serve command */ {
-  serve.option(
-    "-H, --host <ip-address>",
-    "serve on this port",
-    (value) => {
-      if (! net.isIP(value)) throw new Error(`${value} is not a valid IP address`)
-      else return value;
-    },
-  );
+  serve.option("-H, --host <ip-address>", "serve on this port", (value) => {
+    if (!net.isIP(value)) throw new Error(`${value} is not a valid IP address`);
+    else return value;
+  });
 }
 
 /* Adding the 'port' option to the serve command */ {
-  serve.option(
-    "-p, --port <int>",
-    "serve on this port",
-    (value) => Number(value),
+  serve.option("-p, --port <int>", "serve on this port", (value) =>
+    Number(value),
   );
 }
 
@@ -141,7 +131,7 @@ let options: Record<string, any>;
     program.parse(process.argv, { from: "node" });
     options = program.opts();
     console.info(options);
-  } catch (error:any) {
+  } catch (error: any) {
     if (error.code === "commander.unknownOption") process.exit(3);
     if (error.code === "commander.missingArgument") process.exit(4);
     if (error.code === "commander.invalidArgument") process.exit(5);
@@ -165,12 +155,11 @@ const resolvedImports = FastGlob.sync(options.includeImport, {
   dot: true,
 });
 
-
 console.info({ resolvedLogLevel, resolvedImports });
 
 // /* Adding watchers to all files included if needed */ {
 //   // if (options.watch) options.forEach(file => {
-    
+
 //   // });
 //     fs.watch("./some-file.txt", (eventType, filename) => {
 //     console.log(`${filename} changed: ${eventType}`);
