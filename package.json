@@ -46,8 +46,8 @@
   "imports": {
     "#src/*": "./src/*.js",
     "#package": "./package.json",
-    "#lib": "./src/lib/index.js",
-    "#lib/*": "lib/*.js"
+    "#lib": "./lib/index.js",
+    "#lib/*": "./lib/*.js"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
