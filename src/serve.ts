@@ -17,6 +17,12 @@ export interface ServeArgs {
   host?: string;
 
   /**
+   * The prefix to serve from. Allows you to serve from e.g. the `/presentation` subdirectory. So you'd have to
+   * request `https://example.com/presentation` to get the presentation.
+   */
+  root?: string;
+
+  /**
    * The callback to execute when starting the server
    */
   callback?: (args: RequireAll<ServeArgs>, error?: Error) => void;
@@ -30,6 +36,7 @@ export namespace ServeArgs {
   export const defaults = {
     port: 8484,
     host: "0.0.0.0",
+    root: "/",
     callback: (args: RequireAll<ServeArgs>, error?: Error) => {
       if (error) console.error(`Error starting server: ${error.message}`);
       else
@@ -46,6 +53,7 @@ export namespace ServeArgs {
     return {
       port: options.port ?? ServeArgs.defaults.port,
       host: options.host ?? ServeArgs.defaults.host,
+      root: options.root ?? ServeArgs.defaults.root,
       callback: options.callback ?? ServeArgs.defaults.callback,
     } satisfies RequireAll<ServeArgs>;
   }

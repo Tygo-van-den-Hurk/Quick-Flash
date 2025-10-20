@@ -167,6 +167,14 @@ const serve = program
   );
 }
 
+/* Adding the 'port' option to the serve command */ {
+  serve.option(
+    "-r, --root <prefix>", 
+    "The root prefix the serve on. If specified serve from that subdirectory.", 
+    "/"
+  );
+}
+
 /* Try parsing the arguments */ {
   try {
     program.parse(process.argv, { from: "node" });
