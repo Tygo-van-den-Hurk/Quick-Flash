@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import pkg from "#package" with { type: "json" };
+import { Logger } from "#lib";
 import { LogLevel } from "#lib";
+import pkg from "#package" with { type: "json" };
 import { serve as startServer } from "#src/serve";
 import { compile as compileFile } from "#src/compile";
 import { Command } from "commander";
@@ -9,6 +10,41 @@ import FastGlob from "fast-glob";
 import path from "path";
 import fs from "fs";
 import net from "net";
+
+/**
+ * Merges the options of the subcommand, and the main command, and then executes the function given.
+ */
+function mergeArgsAndExec(command: Command, func: Function) {
+  
+  const options = ({ 
+    ...(command.parent?.opts() ?? {}), 
+    ...(command.opts() ?? {})
+  });
+
+  const resolvedLogLevel = (options.verbose as number) + LogLevel.toNumber(options.logLevel);
+  Logger.logLevel = LogLevel.fromNumber(resolvedLogLevel);
+  Logger.debug(`Set LogLevel to: ${Logger.logLevel}`);
+  
+  Logger.debug("options:", options);
+  
+  const resolvedImports = FastGlob.sync(options.includeImport, {
+    ignore: options.ignoreInIncludeImport,
+    caseSensitiveMatch: true,
+    followSymbolicLinks: true,
+    braceExpansion: true,
+    onlyFiles: true,
+    globstar: true,
+    extglob: true,
+    unique: true,
+    dot: true,
+  });
+  
+  Logger.debug("resolved:", { resolvedLogLevel, resolvedImports });
+  
+  return func(options);
+}
+
+// Declare CLI options
 
 const program = new Command();
 
@@ -53,7 +89,7 @@ const program = new Command();
     "-l, --log-level <level>",
     `To log level to use when running. Must be one of: ${LogLevel.options}`,
     (value) => LogLevel.parser.parse(value),
-    LogLevel.INFO,
+    Logger.DEFAULT_LOG_LEVEL,
   );
 }
 
@@ -95,22 +131,28 @@ const program = new Command();
 
       return file;
     },
+    "./slides.yaml",
   );
 }
 
 const compile = program
   .command("compile")
   .description("compile and then write the changes")
-  .action((opts) => compileFile(opts));
+  .action((_, command) => mergeArgsAndExec(command, compileFile));
 
 /* Adding the 'port' option to the serve command */ {
-  compile.option("-o, --output <path>", "serve on this port", undefined);
+  compile.option(
+    "-o, --output <path>", 
+    "serve on this port", 
+    (value) => path.resolve(value),
+    "./slides.html",
+  );
 }
 
 const serve = program
   .command("serve")
   .description("compile and then serve on a webserver")
-  .action((opts) => startServer(opts));
+  .action((_, command) => mergeArgsAndExec(command, startServer));
 
 /* Adding the 'host' option to the serve command */ {
   serve.option("-H, --host <ip-address>", "serve on this port", (value) => {
@@ -125,12 +167,9 @@ const serve = program
   );
 }
 
-let options: Record<string, any>;
 /* Try parsing the arguments */ {
   try {
     program.parse(process.argv, { from: "node" });
-    options = program.opts();
-    console.info(options);
   } catch (error: any) {
     if (error.code === "commander.unknownOption") process.exit(3);
     if (error.code === "commander.missingArgument") process.exit(4);
@@ -141,21 +180,6 @@ let options: Record<string, any>;
     process.exit(1);
   }
 }
-
-const resolvedLogLevel = options.verbose + LogLevel.toNumber(options.logLevel);
-const resolvedImports = FastGlob.sync(options.includeImport, {
-  ignore: options.ignoreInIncludeImport,
-  caseSensitiveMatch: true,
-  followSymbolicLinks: true,
-  braceExpansion: true,
-  onlyFiles: true,
-  globstar: true,
-  extglob: true,
-  unique: true,
-  dot: true,
-});
-
-console.info({ resolvedLogLevel, resolvedImports });
 
 // /* Adding watchers to all files included if needed */ {
 //   // if (options.watch) options.forEach(file => {
