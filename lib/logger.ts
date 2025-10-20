@@ -3,9 +3,6 @@ import { LogLevel } from "#lib";
 /** The exact type of `console.xyz()`. */
 type LogFunction = typeof console.info;
 
-/** A function that ignores all it's arguments. */
-const devNull: LogFunction = (_message?: any, ..._optionalParams: any[]) => {};
-
 /** The logger of the application. */
 export class Logger {
   
@@ -13,33 +10,56 @@ export class Logger {
   public static readonly DEFAULT_LOG_LEVEL: LogLevel = LogLevel.INFO;
 
   /** A function that ignores all it's arguments. */
-  private static readonly DEV_NULL: LogFunction = devNull;
+  public static readonly DEV_NULL: LogFunction = (_message?: any, ..._optionalParams: any[]) => {};;
   
   /** A function that prints as `console.log` to STD out. */
-  private static readonly STD_OUT: LogFunction = console.info;
+  public static readonly STD_OUT: LogFunction = console.info;
 
   /** A function that prints as `console.log` to STD err. */
-  private static readonly STD_ERR: LogFunction = console.error;
+  public static readonly STD_ERR: LogFunction = console.error;
 
   /**
    * The default function for each `LogLevel`.
    */
-  public static readonly DEFAULT_FUNCTIONS: Readonly<Record<LogLevel, LogFunction>> = Object.freeze({
+  private static _DEFAULT_FUNCTIONS: Record<LogLevel, LogFunction> = {
     [LogLevel.SILENT]: Logger.DEV_NULL,
     [LogLevel.CRITICAL]: Logger.STD_ERR,
     [LogLevel.ERROR]: Logger.STD_ERR,
     [LogLevel.WARN]: Logger.STD_ERR,
     [LogLevel.INFO]: Logger.STD_OUT,
     [LogLevel.DEBUG]: Logger.STD_OUT,
-  });
+  };
+        
+  /**
+   * The default function for each `LogLevel`.
+   */
+  public static get DEFAULT_FUNCTIONS(): Readonly<typeof Logger._DEFAULT_FUNCTIONS> {
+    return Object.freeze({ ...Logger._DEFAULT_FUNCTIONS });
+  }
+    
+  /**
+   * The default function for each `LogLevel`.
+   */
+  public static set DEFAULT_FUNCTIONS(value: Readonly<typeof Logger._DEFAULT_FUNCTIONS>) {
+    Logger._DEFAULT_FUNCTIONS = value;
+    const level = LogLevel.fromNumber(LogLevel.toNumber(Logger.logLevel));
+    Logger.logLevel = level; // updates functions being used
+  }
 
   /** 
    * the functions to call depending on what level is set. Allows for setting a function of a particular level.
    */
-  private static functions: Record<LogLevel, LogFunction> = {
+  private static _functions: Record<LogLevel, LogFunction> = {
     ...Logger.DEFAULT_FUNCTIONS,
   };
-  
+
+  /** 
+   * the functions to call depending on what level is set. Allows for setting a function of a particular level.
+   */
+  public static get functions(): Readonly<typeof Logger._functions> {
+    return Logger._functions;
+  };
+
   /**
    * The internal log level of the logger.
    */
@@ -60,8 +80,8 @@ export class Logger {
     const newLevel = LogLevel.toNumber(value);
     for (let level = 0; level < LogLevel.options.length; level++) {
       const index = LogLevel.fromNumber(level);
-      if (level < newLevel) Logger.functions[index] = Logger.DEV_NULL;
-      else Logger.functions[index] = Logger.DEFAULT_FUNCTIONS[index];
+      if (level < newLevel) Logger._functions[index] = Logger.DEV_NULL;
+      else Logger._functions[index] = Logger.DEFAULT_FUNCTIONS[index];
     }
   };
 
