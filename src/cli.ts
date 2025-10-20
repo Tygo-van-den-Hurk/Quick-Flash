@@ -3,8 +3,8 @@
 import { Logger } from "#lib";
 import { LogLevel } from "#lib";
 import pkg from "#package" with { type: "json" };
-import { serve as startServer } from "#src/serve";
-import { compile as compileFile } from "#src/compile";
+import { serve as startServer, ServeArgs } from "#src/serve";
+import { compile as compileFile, CompileArgs } from "#src/compile";
 import { Command } from "commander";
 import FastGlob from "fast-glob";
 import path from "path";
@@ -148,9 +148,9 @@ const compile = program
 /* Adding the 'port' option to the serve command */ {
   compile.option(
     "-o, --output <path>",
-    "serve on this port",
+    "The path to write the output to",
     (value) => path.resolve(value),
-    "./slides.html",
+    CompileArgs.defaults.output,
   );
 }
 
@@ -160,15 +160,23 @@ const serve = program
   .action((_, command) => mergeArgsAndExec(command, startServer));
 
 /* Adding the 'host' option to the serve command */ {
-  serve.option("-H, --host <ip-address>", "serve on this port", (value) => {
-    if (!net.isIP(value)) throw new Error(`${value} is not a valid IP address`);
-    else return value;
-  });
+  serve.option(
+    "-H, --host <ip-address>",
+    "The host to use ports from.", 
+    (value) => {
+      if (!net.isIP(value)) throw new Error(`${value} is not a valid IP address`);
+      else return value;
+    },
+    ServeArgs.defaults.host,
+  );
 }
 
 /* Adding the 'port' option to the serve command */ {
-  serve.option("-p, --port <int>", "serve on this port", (value) =>
-    Number(value),
+  serve.option(
+    "-p, --port <int>", 
+    "The port to listen on and serve the slides from.", 
+    (value) => Number(value),
+    ServeArgs.defaults.port,
   );
 }
 
@@ -176,7 +184,11 @@ const serve = program
   serve.option(
     "-r, --root <prefix>",
     "The root prefix the serve on. If specified serve from that subdirectory.",
-    "/",
+    (value) => { 
+      if (value.startsWith("/")) return value;
+      else throw new Error(`root paths must start with '/', but got ${value}`);
+    },
+    ServeArgs.defaults.root,
   );
 }
 
