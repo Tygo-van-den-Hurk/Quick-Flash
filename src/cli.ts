@@ -16,8 +16,8 @@ import net from "net";
  */
 function mergeArgsAndExec(command: Command, func: Function) {
   const options = {
-    ...(command.parent?.opts() ?? {}),
-    ...(command.opts() ?? {}),
+    ...(command.parent!.opts()),
+    ...(command.opts()),
   };
 
   const resolvedLogLevel =
@@ -41,7 +41,12 @@ function mergeArgsAndExec(command: Command, func: Function) {
 
   Logger.debug("resolved:", { resolvedLogLevel, resolvedImports });
 
-  return func(options);
+  try {
+    return func(options);
+  } catch (error: any) {
+    if (error instanceof Error) Logger.critical(error.message);
+    else Logger.critical(error);
+  }
 }
 
 // Declare CLI options
