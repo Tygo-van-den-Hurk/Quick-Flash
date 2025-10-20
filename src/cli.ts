@@ -15,18 +15,18 @@ import net from "net";
  * Merges the options of the subcommand, and the main command, and then executes the function given.
  */
 function mergeArgsAndExec(command: Command, func: Function) {
-  
-  const options = ({ 
-    ...(command.parent?.opts() ?? {}), 
-    ...(command.opts() ?? {})
-  });
+  const options = {
+    ...(command.parent?.opts() ?? {}),
+    ...(command.opts() ?? {}),
+  };
 
-  const resolvedLogLevel = (options.verbose as number) + LogLevel.toNumber(options.logLevel);
+  const resolvedLogLevel =
+    (options.verbose as number) + LogLevel.toNumber(options.logLevel);
   Logger.logLevel = LogLevel.fromNumber(resolvedLogLevel);
   Logger.debug(`Set LogLevel to: ${Logger.logLevel}`);
-  
+
   Logger.debug("options:", options);
-  
+
   const resolvedImports = FastGlob.sync(options.includeImport, {
     ignore: options.ignoreInIncludeImport,
     caseSensitiveMatch: true,
@@ -38,9 +38,9 @@ function mergeArgsAndExec(command: Command, func: Function) {
     unique: true,
     dot: true,
   });
-  
+
   Logger.debug("resolved:", { resolvedLogLevel, resolvedImports });
-  
+
   return func(options);
 }
 
@@ -142,8 +142,8 @@ const compile = program
 
 /* Adding the 'port' option to the serve command */ {
   compile.option(
-    "-o, --output <path>", 
-    "serve on this port", 
+    "-o, --output <path>",
+    "serve on this port",
     (value) => path.resolve(value),
     "./slides.html",
   );
@@ -169,9 +169,9 @@ const serve = program
 
 /* Adding the 'port' option to the serve command */ {
   serve.option(
-    "-r, --root <prefix>", 
-    "The root prefix the serve on. If specified serve from that subdirectory.", 
-    "/"
+    "-r, --root <prefix>",
+    "The root prefix the serve on. If specified serve from that subdirectory.",
+    "/",
   );
 }
 

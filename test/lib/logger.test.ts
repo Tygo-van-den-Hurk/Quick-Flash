@@ -4,7 +4,7 @@ import { vi, beforeAll, afterEach } from "vitest";
 
 describe("class Logger", () => {
   // tests for the `Logger` class
-  
+
   const spy = vi.fn(Logger.DEV_NULL);
 
   beforeAll(() => {
@@ -49,5 +49,5 @@ describe("class Logger", () => {
       (Logger[key] as Function)(message);
       expect(spy).toHaveBeenCalledWith(message);
     }
-  }); 
+  });
 });
