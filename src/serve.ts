@@ -73,12 +73,12 @@ export function serveResult(request: Request, response: Response) {
 /**
  * Compiles and then serves the result
  */
-export function serve(options: ServeArgs = ServeArgs.defaults): void {
+export function serve(args: ServeArgs = ServeArgs.defaults): void {
+  const options = ServeArgs.fillUpWithDefaults(args);
+  const router = express.Router();
+  router.get(/.*/, serveResult);
   const app = express();
-  app.get(/.*/, serveResult);
-  const resolvedOptions: RequireAll<ServeArgs> =
-    ServeArgs.fillUpWithDefaults(options);
-  app.listen(resolvedOptions.port, (error?: Error) =>
-    resolvedOptions.callback(resolvedOptions, error),
-  );
+  app.use(options.root, router);
+  const callbackWrapper = (error?: Error) => options.callback(options, error);
+  app.listen(options.port, options.host, callbackWrapper);
 }
