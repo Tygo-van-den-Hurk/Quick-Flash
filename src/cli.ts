@@ -14,7 +14,7 @@ import net from "net";
 /**
  * Merges the options of the subcommand, and the main command, and then executes the function given.
  */
-function mergeArgsAndExec(command: Command, func: Function) {
+export function mergeArgsAndExec(command: Command, func: Function) {
   const options = {
     ...(command.parent!.opts()),
     ...(command.opts()),
@@ -51,7 +51,7 @@ function mergeArgsAndExec(command: Command, func: Function) {
 
 // Declare CLI options
 
-const program = new Command();
+export const program = new Command();
 
 /* Setting options for how the CLI should behave */ {
   program.name(pkg.name);
@@ -140,7 +140,7 @@ const program = new Command();
   );
 }
 
-const compile = program
+export const compile = program
   .command("compile")
   .description("compile and then write the changes")
   .action((_, command) => mergeArgsAndExec(command, compileFile));
@@ -154,7 +154,7 @@ const compile = program
   );
 }
 
-const serve = program
+export const serve = program
   .command("serve")
   .description("compile and then serve on a webserver")
   .action((_, command) => mergeArgsAndExec(command, startServer));
@@ -193,16 +193,18 @@ const serve = program
 }
 
 /* Try parsing the arguments */ {
-  try {
-    program.parse(process.argv, { from: "node" });
-  } catch (error: any) {
-    if (error.code === "commander.unknownOption") process.exit(3);
-    if (error.code === "commander.missingArgument") process.exit(4);
-    if (error.code === "commander.invalidArgument") process.exit(5);
-    if (error.code === "commander.optionMissingArgument") process.exit(6);
-    if (error.code === "commander.helpDisplayed") process.exit(0);
-    if (error.code === "commander.version") process.exit(0);
-    process.exit(1);
+  if (import.meta.url === `file://${process.argv[1]}`) {
+    try { // being run as main file, not imported.
+      program.parse(process.argv, { from: "node" });
+    } catch (error: any) {
+      if (error.code === "commander.unknownOption") process.exit(3);
+      if (error.code === "commander.missingArgument") process.exit(4);
+      if (error.code === "commander.invalidArgument") process.exit(5);
+      if (error.code === "commander.optionMissingArgument") process.exit(6);
+      if (error.code === "commander.helpDisplayed") process.exit(0);
+      if (error.code === "commander.version") process.exit(0);
+      process.exit(1);
+    }
   }
 }
 
