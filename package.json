@@ -38,6 +38,7 @@
     "commander": "^14.0.1",
     "express": "^5.1.0",
     "fast-glob": "^3.3.3",
+    "xml-parser-xo": "^4.1.5",
     "yaml": "^2.8.1",
     "zod": "^4.1.12"
   },
