@@ -16,8 +16,8 @@ import net from "net";
  */
 export function mergeArgsAndExec(command: Command, func: Function) {
   const options = {
-    ...(command.parent!.opts()),
-    ...(command.opts()),
+    ...command.parent!.opts(),
+    ...command.opts(),
   };
 
   const resolvedLogLevel =
@@ -162,9 +162,10 @@ export const serve = program
 /* Adding the 'host' option to the serve command */ {
   serve.option(
     "-H, --host <ip-address>",
-    "The host to use ports from.", 
+    "The host to use ports from.",
     (value) => {
-      if (!net.isIP(value)) throw new Error(`${value} is not a valid IP address`);
+      if (!net.isIP(value))
+        throw new Error(`${value} is not a valid IP address`);
       else return value;
     },
     ServeArgs.defaults.host,
@@ -173,8 +174,8 @@ export const serve = program
 
 /* Adding the 'port' option to the serve command */ {
   serve.option(
-    "-p, --port <int>", 
-    "The port to listen on and serve the slides from.", 
+    "-p, --port <int>",
+    "The port to listen on and serve the slides from.",
     (value) => Number(value),
     ServeArgs.defaults.port,
   );
@@ -184,7 +185,7 @@ export const serve = program
   serve.option(
     "-r, --root <prefix>",
     "The root prefix the serve on. If specified serve from that subdirectory.",
-    (value) => { 
+    (value) => {
       if (value.startsWith("/")) return value;
       else throw new Error(`root paths must start with '/', but got ${value}`);
     },
@@ -194,7 +195,8 @@ export const serve = program
 
 /* Try parsing the arguments */ {
   if (import.meta.url === `file://${process.argv[1]}`) {
-    try { // being run as main file, not imported.
+    try {
+      // being run as main file, not imported.
       program.parse(process.argv, { from: "node" });
     } catch (error: any) {
       if (error.code === "commander.unknownOption") process.exit(3);

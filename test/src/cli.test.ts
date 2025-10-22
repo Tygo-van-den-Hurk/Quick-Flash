@@ -1,6 +1,6 @@
-import { program, compile, serve } from '#src/cli';
+import { program, compile, serve } from "#src/cli";
 import { describe, test, expect } from "vitest";
-import { Command } from 'commander';
+import { Command } from "commander";
 
 describe("program", () => {
   // tests relating `program`:
@@ -12,7 +12,7 @@ describe("program", () => {
 
 describe("compile", () => {
   // tests relating `compile`:
-  
+
   test("to be subcommand of program", () => {
     expect(compile).toBeInstanceOf(Command);
     expect(compile.parent).toBe(program);
@@ -21,7 +21,7 @@ describe("compile", () => {
 
 describe("serve", () => {
   // tests relating `serve`:
-  
+
   test("to be subcommand of program", () => {
     expect(serve).toBeInstanceOf(Command);
     expect(serve.parent).toBe(program);
