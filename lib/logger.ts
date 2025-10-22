@@ -75,13 +75,12 @@ export class Logger {
   /**
    * The level to log. Anything using a lower level is discarded.
    */
-  public static set logLevel(value: LogLevel) {
-    Logger._logLevel = value;
-    const newLevel = LogLevel.toNumber(value);
-    for (let level = 0; level < LogLevel.options.length; level++) {
-      const index = LogLevel.fromNumber(level);
-      if (level < newLevel) Logger._functions[index] = Logger.DEV_NULL;
-      else Logger._functions[index] = Logger.DEFAULT_FUNCTIONS[index];
+  public static set logLevel(newLevel: LogLevel) {
+    Logger._logLevel = newLevel;
+    for (let index = 0; index < LogLevel.options.length; index++) {
+      const level = LogLevel.fromNumber(index);
+      if (LogLevel.of(level).isMoreVerboseThen(newLevel)) Logger._functions[level] = Logger.DEV_NULL;
+      else Logger._functions[level] = Logger.DEFAULT_FUNCTIONS[level];
     }
   };
 

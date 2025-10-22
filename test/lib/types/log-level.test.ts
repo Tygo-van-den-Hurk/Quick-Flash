@@ -69,6 +69,68 @@ describe("enum LogLevel", () => {
     }
   });
 
+  // LogLevel comparisons
+
+  test("LogLevel.of(LogLevel.XYZ).isMoreVerboseThen(LogLevel.ABC)", () => {
+    const debug = LogLevel.DEBUG;
+    const critical = LogLevel.CRITICAL;
+    const assumption = LogLevel.of(debug).isMoreVerboseThen(critical);
+    expect(assumption).toBe(true);
+    for (let index = 0; index < LogLevel.options.length - 1; index++) {
+      const level1 = LogLevel.fromNumber(index);
+      const level2 = LogLevel.fromNumber(index + 1);
+      const assertion = LogLevel.of(level1).isMoreVerboseThen(level2);
+      expect(assertion).toBe(true);
+    }
+  });
+
+  test("LogLevel.of(LogLevel.XYZ).isMoreOrAsVerboseAs(LogLevel.ABC)", () => {
+    const debug = LogLevel.DEBUG;
+    const critical = LogLevel.CRITICAL;
+    const assumption1 = LogLevel.of(debug).isMoreOrAsVerboseAs(critical);
+    expect(assumption1).toBe(true);
+    const assumption2 = LogLevel.of(debug).isMoreOrAsVerboseAs(debug);
+    expect(assumption2).toBe(true);
+    for (let index = 0; index < LogLevel.options.length - 1; index++) {
+      const level1 = LogLevel.fromNumber(index);
+      const level2 = LogLevel.fromNumber(index + 1);
+      const assertion1 = LogLevel.of(level1).isMoreOrAsVerboseAs(level2);
+      expect(assertion1).toBe(true);
+      const assertion2 = LogLevel.of(level1).isMoreOrAsVerboseAs(level1);
+      expect(assertion2).toBe(true);
+    }
+  });
+
+  test("LogLevel.of(LogLevel.XYZ).isLessVerboseThen(LogLevel.ABC)", () => {
+    const debug = LogLevel.DEBUG;
+    const critical = LogLevel.CRITICAL;
+    const assumption = LogLevel.of(critical).isLessVerboseThen(debug);
+    expect(assumption).toBe(true);
+    for (let index = 0; index < LogLevel.options.length - 1; index++) {
+      const level1 = LogLevel.fromNumber(index);
+      const level2 = LogLevel.fromNumber(index + 1);
+      const assertion = LogLevel.of(level2).isLessVerboseThen(level1);
+      expect(assertion).toBe(true);
+    }
+  });
+
+  test("LogLevel.of(LogLevel.XYZ).isLessOrAsVerboseAs(LogLevel.ABC)", () => {
+    const debug = LogLevel.DEBUG;
+    const critical = LogLevel.CRITICAL;
+    const assumption1 = LogLevel.of(critical).isLessOrAsVerboseAs(debug);
+    expect(assumption1).toBe(true);
+    const assumption2 = LogLevel.of(debug).isLessOrAsVerboseAs(debug);
+    expect(assumption2).toBe(true);
+    for (let index = 0; index < LogLevel.options.length - 1; index++) {
+      const level1 = LogLevel.fromNumber(index);
+      const level2 = LogLevel.fromNumber(index + 1);
+      const assertion1 = LogLevel.of(level2).isLessOrAsVerboseAs(level1);
+      expect(assertion1).toBe(true);
+      const assertion2 = LogLevel.of(level2).isLessOrAsVerboseAs(level2);
+      expect(assertion2).toBe(true);
+    }
+  });
+
   // Enum options
 
   test("LogLevel.OPTION === option", () => {

@@ -37,6 +37,20 @@ export namespace LogLevel {
   }
 
   /**
+   * for comparing `LogLevel`s.
+   */
+  export const of = (level1: LogLevel) => Object.freeze({
+    /** Returns `true` if the first `LogLevel` is strictly more verbose then the second `LogLevel`. */
+    isMoreVerboseThen: (level2: LogLevel) => LogLevel.toNumber(level1) < LogLevel.toNumber(level2),
+    /** Returns `true` if the first `LogLevel` is more or as verbose as the second `LogLevel`. */
+    isMoreOrAsVerboseAs: (level2: LogLevel) => LogLevel.toNumber(level1) <= LogLevel.toNumber(level2),
+    /** Returns `true` if the first `LogLevel` is strictly less verbose then the second `LogLevel`. */
+    isLessVerboseThen: (level2: LogLevel) => LogLevel.toNumber(level1) > LogLevel.toNumber(level2),
+    /** Returns `true` if the first `LogLevel` is less or as verbose as the second `LogLevel`. */
+    isLessOrAsVerboseAs: (level2: LogLevel) => LogLevel.toNumber(level1) >= LogLevel.toNumber(level2),
+  });
+
+  /**
    * The parser to return `LogLevel`s.
    */
   export const parser = LogLevelParser;

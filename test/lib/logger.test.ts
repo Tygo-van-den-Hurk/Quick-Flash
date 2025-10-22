@@ -40,6 +40,21 @@ describe("class Logger", () => {
     }
   });
 
+  test("if Logger.logLevel is less verbose then function print nothing", () => {
+    Logger.logLevel = LogLevel.DEBUG;
+    for (const level of LogLevel.options) {
+      expect(Logger.DEFAULT_FUNCTIONS[level]).not.toBe(Logger.DEV_NULL);
+      expect(Logger.functions[level]).not.toBe(Logger.DEV_NULL);
+    }  
+    
+    Logger.logLevel = LogLevel.SILENT;
+    for (const level of LogLevel.options) {
+      if (LogLevel.of(level).isLessOrAsVerboseAs(Logger.logLevel)) continue;
+      expect(Logger.DEFAULT_FUNCTIONS[level]).not.toBe(Logger.DEV_NULL);
+      expect(Logger.functions[level]).toBe(Logger.DEV_NULL);
+    }  
+  });
+
   test("Logger.${logLevel}() to print through it's function", () => {
     for (const level of LogLevel.options) {
       if (level === LogLevel.SILENT) continue;
