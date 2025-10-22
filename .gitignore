@@ -10,7 +10,12 @@
 **/result
 **/result-*
 
-# Find common git ignore templates at: https://github.com/github/gitignore
+# Compiled `Embedded TypeScript` files
+**/*.ets.ts
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# ~~~ Find common git ignore templates at: https://github.com/github/gitignore ~~~ #
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
 # Logs
 logs

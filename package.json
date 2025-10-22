@@ -21,7 +21,9 @@
   "main": "dist/src/cli.js",
   "scripts": {
     "start": "node dist/src/cli.js",
-    "build": "tsc",
+    "build": "npm --silent run build:ets && npm --silent run build:tsc",
+    "build:tsc": "tsc",
+    "build:ets": "ets",
     "type-check": "tsc --noEmit",
     "test": "vitest --dir test run --silent passed-only",
     "test:watch": "vitest --dir test watch --cache --silent passed-only",
@@ -36,6 +38,7 @@
   },
   "dependencies": {
     "commander": "^14.0.1",
+    "embedded-typescript": "^0.1.0",
     "express": "^5.1.0",
     "fast-glob": "^3.3.3",
     "xml-parser-xo": "^4.1.5",
