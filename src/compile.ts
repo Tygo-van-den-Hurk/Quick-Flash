@@ -4,7 +4,6 @@ import { RequireAll } from "#lib";
  * The possible options you can provide to the `compile` function.
  */
 export interface CompileArgs {
-  
   /** The path to output on */
   output: string;
 }
