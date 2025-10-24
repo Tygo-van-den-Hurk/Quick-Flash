@@ -1,4 +1,5 @@
 import { LogLevel } from "#lib";
+import chalk from "chalk";
 
 /** The exact type of `console.xyz()`. */
 type LogFunction = typeof console.info;
@@ -90,7 +91,10 @@ export class Logger {
    * arguments are all passed to `util.format()`).
    */
   public static readonly critical: LogFunction = (message?: any, ...optionalParams: any[]):void => {
-    Logger.functions[LogLevel.CRITICAL](message, ...optionalParams);
+    Logger.functions[LogLevel.CRITICAL](
+      `${chalk.bold.magenta(LogLevel.CRITICAL.toUpperCase())}:`, message,
+      ...optionalParams
+    );
   }
 
   /**
@@ -99,7 +103,10 @@ export class Logger {
    * arguments are all passed to `util.format()`).
    */
   public static readonly error: LogFunction = (message?: any, ...optionalParams: any[]):void => {
-    Logger.functions[LogLevel.ERROR](message, ...optionalParams);
+    Logger.functions[LogLevel.ERROR](
+      `${chalk.bold.red(LogLevel.ERROR.toUpperCase())}:`, message,
+      ...optionalParams
+    );
   }
   
   /**
@@ -108,7 +115,10 @@ export class Logger {
    * arguments are all passed to `util.format()`).
    */
   public static readonly warn: LogFunction = (message?: any, ...optionalParams: any[]):void => {
-    Logger.functions[LogLevel.WARN](message, ...optionalParams);
+    Logger.functions[LogLevel.WARN](
+      `${chalk.bold.yellow(LogLevel.WARN.toUpperCase())}:`, message,
+      ...optionalParams
+    );
   }
 
   /**
@@ -117,7 +127,10 @@ export class Logger {
    * arguments are all passed to `util.format()`).
    */
   public static readonly info: LogFunction = (message?: any, ...optionalParams: any[]):void => {
-    Logger.functions[LogLevel.INFO](message, ...optionalParams);
+    Logger.functions[LogLevel.INFO](
+      `${chalk.bold.cyan(LogLevel.INFO.toUpperCase())}:`,  message, 
+      ...optionalParams
+    );
   }
 
   /**
@@ -126,7 +139,10 @@ export class Logger {
    * arguments are all passed to `util.format()`).
    */
   public static readonly debug: LogFunction = (message?: any, ...optionalParams: any[]):void => {
-    Logger.functions[LogLevel.DEBUG](message, ...optionalParams);
+    Logger.functions[LogLevel.DEBUG](
+      `${chalk.bold.green(LogLevel.DEBUG.toUpperCase())}:`,  message, 
+      ...optionalParams
+    );
   }
 }
 
