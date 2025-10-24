@@ -42,6 +42,7 @@
     "embedded-typescript": "^0.1.0",
     "express": "^5.1.0",
     "fast-glob": "^3.3.3",
+    "flat": "^6.0.1",
     "ora": "^9.0.0",
     "xml-parser-xo": "^4.1.5",
     "yaml": "^2.8.1",
