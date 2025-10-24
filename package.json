@@ -37,6 +37,7 @@
     "format:write": "prettier '{src,test}/**/*.{js,ts}' --write"
   },
   "dependencies": {
+    "chalk": "^5.6.2",
     "commander": "^14.0.1",
     "embedded-typescript": "^0.1.0",
     "express": "^5.1.0",
