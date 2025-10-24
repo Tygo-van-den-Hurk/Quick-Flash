@@ -45,14 +45,14 @@ describe("class Logger", () => {
     for (const level of LogLevel.options) {
       expect(Logger.DEFAULT_FUNCTIONS[level]).not.toBe(Logger.DEV_NULL);
       expect(Logger.functions[level]).not.toBe(Logger.DEV_NULL);
-    }  
-    
+    }
+
     Logger.logLevel = LogLevel.SILENT;
     for (const level of LogLevel.options) {
       if (LogLevel.of(level).isLessOrAsVerboseAs(Logger.logLevel)) continue;
       expect(Logger.DEFAULT_FUNCTIONS[level]).not.toBe(Logger.DEV_NULL);
       expect(Logger.functions[level]).toBe(Logger.DEV_NULL);
-    }  
+    }
   });
 
   test("Logger.${logLevel}() to print through it's function", () => {
@@ -62,7 +62,7 @@ describe("class Logger", () => {
       const message = "Hello, World!";
       const key = level as keyof typeof Logger;
       (Logger[key] as Function)(message);
-      expect(spy).toHaveBeenCalledWith(message);
+      expect(spy).toHaveBeenCalledWith(expect.any(String), message);
     }
   });
 });
