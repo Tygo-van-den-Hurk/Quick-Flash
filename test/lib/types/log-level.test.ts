@@ -1,16 +1,14 @@
-import { describe, test, expect } from "vitest";
-import { LogLevel } from "#lib";
+import { describe, expect, test } from 'vitest';
+import { LogLevel } from '#lib';
 
-describe("enum LogLevel", () => {
+describe('enum LogLevel', () => {
   // LogLevel options
 
-  test("LogLevel.options === LogLevel.parser.options", () => {
-    expect([...LogLevel.parser.options].sort()).toStrictEqual(
-      [...LogLevel.options].sort(),
-    );
+  test('LogLevel.options === LogLevel.parser.options', () => {
+    expect([...LogLevel.parser.options].sort()).toStrictEqual([...LogLevel.options].sort());
   });
 
-  test("LogLevel.options", () => {
+  test('LogLevel.options', () => {
     expect([...LogLevel.options].sort()).toStrictEqual(
       [
         LogLevel.DEBUG,
@@ -19,39 +17,39 @@ describe("enum LogLevel", () => {
         LogLevel.ERROR,
         LogLevel.CRITICAL,
         LogLevel.SILENT,
-      ].sort(),
+      ].sort()
     );
   });
 
   // LogLevel parser
 
-  test("LogLevel.parser.parse()", () => {
+  test('LogLevel.parser.parse()', () => {
     for (const level of LogLevel.options) {
       expect(LogLevel.parser.parse(level)).toBe(level);
     }
   });
 
-  test("LogLevel.parser.parse() > throw", () => {
-    expect(() => LogLevel.parser.parse("notalevel")).toThrow();
+  test('LogLevel.parser.parse() > throw', () => {
+    expect(() => LogLevel.parser.parse('notalevel')).toThrow();
   });
 
   // LogLevel as number
 
-  test("LogLevel.fromNumber(LogLevel.toNumber(x)) === x", () => {
+  test('LogLevel.fromNumber(LogLevel.toNumber(x)) === x', () => {
     for (const level of LogLevel.options) {
       const result = LogLevel.fromNumber(LogLevel.toNumber(level));
       expect(result).toBe(level);
     }
   });
 
-  test("LogLevel.toNumber(LogLevel.fromNumber(x)) === x", () => {
+  test('LogLevel.toNumber(LogLevel.fromNumber(x)) === x', () => {
     for (let index = 0; index < LogLevel.options.length; index++) {
       const result = LogLevel.toNumber(LogLevel.fromNumber(index));
       expect(result).toBe(index);
     }
   });
 
-  test("LogLevel.fromNumber(MIN-x) === LogLevel.fromNumber(MIN)", () => {
+  test('LogLevel.fromNumber(MIN-x) === LogLevel.fromNumber(MIN)', () => {
     const MIN = 0;
     for (let index = 1; index < 5; index++) {
       const result1 = LogLevel.fromNumber(MIN - index);
@@ -60,7 +58,7 @@ describe("enum LogLevel", () => {
     }
   });
 
-  test("LogLevel.fromNumber(MAX+x) === LogLevel.fromNumber(MAX)", () => {
+  test('LogLevel.fromNumber(MAX+x) === LogLevel.fromNumber(MAX)', () => {
     const MAX = LogLevel.options.length - 1;
     for (let index = 1; index < 5; index++) {
       const result1 = LogLevel.fromNumber(MAX + index);
@@ -71,7 +69,7 @@ describe("enum LogLevel", () => {
 
   // LogLevel comparisons
 
-  test("LogLevel.of(LogLevel.XYZ).isMoreVerboseThen(LogLevel.ABC)", () => {
+  test('LogLevel.of(LogLevel.XYZ).isMoreVerboseThen(LogLevel.ABC)', () => {
     const debug = LogLevel.DEBUG;
     const critical = LogLevel.CRITICAL;
     const assumption = LogLevel.of(debug).isMoreVerboseThen(critical);
@@ -84,7 +82,7 @@ describe("enum LogLevel", () => {
     }
   });
 
-  test("LogLevel.of(LogLevel.XYZ).isMoreOrAsVerboseAs(LogLevel.ABC)", () => {
+  test('LogLevel.of(LogLevel.XYZ).isMoreOrAsVerboseAs(LogLevel.ABC)', () => {
     const debug = LogLevel.DEBUG;
     const critical = LogLevel.CRITICAL;
     const assumption1 = LogLevel.of(debug).isMoreOrAsVerboseAs(critical);
@@ -101,7 +99,7 @@ describe("enum LogLevel", () => {
     }
   });
 
-  test("LogLevel.of(LogLevel.XYZ).isLessVerboseThen(LogLevel.ABC)", () => {
+  test('LogLevel.of(LogLevel.XYZ).isLessVerboseThen(LogLevel.ABC)', () => {
     const debug = LogLevel.DEBUG;
     const critical = LogLevel.CRITICAL;
     const assumption = LogLevel.of(critical).isLessVerboseThen(debug);
@@ -114,7 +112,7 @@ describe("enum LogLevel", () => {
     }
   });
 
-  test("LogLevel.of(LogLevel.XYZ).isLessOrAsVerboseAs(LogLevel.ABC)", () => {
+  test('LogLevel.of(LogLevel.XYZ).isLessOrAsVerboseAs(LogLevel.ABC)', () => {
     const debug = LogLevel.DEBUG;
     const critical = LogLevel.CRITICAL;
     const assumption1 = LogLevel.of(critical).isLessOrAsVerboseAs(debug);
@@ -133,7 +131,7 @@ describe("enum LogLevel", () => {
 
   // Enum options
 
-  test("LogLevel.OPTION === option", () => {
+  test('LogLevel.OPTION === option', () => {
     for (const value of LogLevel.options) {
       const key = value.toUpperCase() as keyof typeof LogLevel;
       expect(LogLevel[key]).toBe(value);
