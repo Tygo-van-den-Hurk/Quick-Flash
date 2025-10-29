@@ -1,248 +1,111 @@
 #!/usr/bin/env node
 
-import { Logger } from "#lib";
-import { LogLevel } from "#lib";
-import pkg from "#package" with { type: "json" };
-import { serve as startServer, ServeArgs } from "#src/serve";
-import { compile as compileFile, CompileArgs } from "#src/compile";
-import { Command } from "commander";
-import FastGlob from "fast-glob";
-import path from "path";
-import fs from "fs";
-import net from "net";
-
-/**
- * Merges the options of the subcommand, and the main command, and then executes the function given.
- */
-export function mergeArgsAndExec(command: Command, func: Function) {
-  const options = {
-    ...command.parent!.opts(),
-    ...command.opts(),
-  };
-
-  const resolvedLogLevel =
-    (options.verbose as number) + LogLevel.toNumber(options.logLevel);
-  Logger.logLevel = LogLevel.fromNumber(resolvedLogLevel);
-  Logger.debug(`Set LogLevel to: ${Logger.logLevel}`);
-
-  Logger.debug("options:", options);
-
-  const resolvedImports = FastGlob.sync(options.includeImport, {
-    ignore: options.ignoreInIncludeImport,
-    caseSensitiveMatch: true,
-    followSymbolicLinks: true,
-    braceExpansion: true,
-    onlyFiles: true,
-    globstar: true,
-    extglob: true,
-    unique: true,
-    dot: true,
-  });
-
-  Logger.debug("resolved:", { resolvedLogLevel, resolvedImports });
-
-  try {
-    return func(options);
-  } catch (error: any) {
-    if (error instanceof Error) Logger.critical(error.message);
-    else Logger.critical(error);
-  }
-}
+import { BasePath, ExitCode, Host, LogLevel, Logger } from '#lib';
+import { Command } from 'commander';
+import { CompileArgs } from '#src/compile';
+import { ServeArgs } from '#src/serve';
+import path from 'path';
+import pkg from '#package' with { type: 'json' };
 
 // Declare CLI options
 
+/** The root CLI argument parser. */
 export const program = new Command();
 
-/* Setting options for how the CLI should behave */ {
-  program.name(pkg.name);
-  program.allowUnknownOption(false);
-  program.allowExcessArguments(false);
-  program.exitOverride();
-  program.version(
-    pkg.version,
-    "-v, --version",
-    "print program version and then exit",
-  );
-}
-
-/** Adding the import these files option */ {
-  program.option(
-    "-i, --include-import <glob>",
-    "a directory or file to import and use as custom tags",
-    (value, previous) => {
-      previous.push(value);
-      return previous;
-    },
-    [] as string[],
-  );
-}
-
-/** Adding the do not import these files option */ {
-  program.option(
-    "-I, --ignore-in-include-import <glob>",
-    "a directory or file to not import and use as custom tags",
-    (value, previous) => {
-      previous.push(value);
-      return previous;
-    },
-    [] as string[],
-  );
-}
-
-/* Adding the 'log-level' option to the CLI */ {
-  program.option(
-    "-l, --log-level <level>",
-    `To log level to use when running. Must be one of: ${LogLevel.options}`,
+program
+  .name(pkg.name)
+  .allowUnknownOption(false)
+  .allowExcessArguments(false)
+  .exitOverride()
+  .combineFlagAndOptionalValue(false)
+  .version(pkg.version, '-v, --version', 'print program version and then exit')
+  .option(
+    '-i, --include-import <glob>',
+    'a directory or file to import and use as custom tags',
+    // eslint-disable-next-line no-sequences, @typescript-eslint/prefer-readonly-parameter-types
+    (value, previous) => (previous.push(value), previous),
+    [] as string[]
+  )
+  .option(
+    '-I, --ignore-in-include-import <glob>',
+    'a directory or file to not import and use as custom tags',
+    // eslint-disable-next-line no-sequences, @typescript-eslint/prefer-readonly-parameter-types
+    (value, previous) => (previous.push(value), previous),
+    [] as string[]
+  )
+  .option(
+    '-l, --log-level <level>',
+    `To log level to use when running. Must be one of: ${LogLevel.options.join(', ')}`,
     (value) => LogLevel.parser.parse(value),
-    Logger.DEFAULT_LOG_LEVEL,
-  );
-}
-
-/* Adding the 'watch' option to the CLI */ {
-  program.option(
-    "-w, --watch <level>",
+    Logger.DEFAULT_LOG_LEVEL
+  )
+  .option(
+    '-w, --watch <level>',
     `watch the specified files, and rerun if they change.`,
     (value) => Boolean(value),
-    false,
+    false
+  )
+  .option(
+    '-V, --verbose',
+    'wether to be more talkative. Raises log level by one per flag.',
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    (_ignore, previous) => previous + 1,
+    LogLevel.toNumber(LogLevel.SILENT)
   );
-}
 
-/* adding the verbose flag/option */ {
-  program.option(
-    "-V, --verbose",
-    "wether to be more talkative. Raises log level by one per flag.",
-    (_, previous) => previous + 1,
-    0,
-  );
-}
+const compileFunctionWrapper = function compileFunctionWrapper(...args: readonly unknown[]): void {
+  Logger.critical(args);
+  /* Temp: await mergeArgsAndExec(command, compileFile); */
+};
 
-/* Adding the config option to the CLI */ {
-  program.option(
-    "-c, --config <path>",
-    "the config file to parse and generate from",
-    (value) => {
-      const file = path.resolve(value);
-
-      const fileExtension =
-        path.extname(file).toLowerCase() || "no file extension";
-      if (fileExtension !== ".yaml" && fileExtension !== ".yml")
-        throw new Error(`Expected a YAML file, but got ${fileExtension}.`);
-
-      if (!fs.existsSync(file))
-        throw new Error(`file does not exist: ${file}.`);
-
-      if (!fs.statSync(file).isDirectory())
-        throw new Error(`not a file: ${file}.`);
-
-      return file;
-    },
-    "./slides.yaml",
-  );
-}
-
+/** The CLI argument parser for the `compile` sub-command. */
 export const compile = program
-  .command("compile")
-  .description("compile and then write the changes")
-  .action((_, command) => mergeArgsAndExec(command, compileFile));
-
-/* Adding the 'port' option to the serve command */ {
-  compile.option(
-    "-o, --output <path>",
-    "The path to write the output to",
+  .command('compile [file]')
+  .description('compile and then write the changes')
+  .action(compileFunctionWrapper)
+  .option(
+    '-o, --output <path>',
+    'The path to write the output to',
     (value) => path.resolve(value),
-    CompileArgs.defaults.output,
+    CompileArgs.defaults.output
   );
-}
 
+const serveFunctionWrapper = function serveFunctionWrapper(...args: readonly unknown[]): void {
+  Logger.critical(args);
+  /* Temp: await mergeArgsAndExec(command, compileFile); */
+};
+
+/** The CLI argument parser for the `serve` sub-command. */
 export const serve = program
-  .command("serve")
-  .description("compile and then serve on a webserver")
-  .action((_, command) => mergeArgsAndExec(command, startServer));
-
-/* Adding the 'host' option to the serve command */ {
-  serve.option(
-    "-H, --host <ip-address>",
-    "The host to use ports from.",
-    (value) => {
-      if (!net.isIP(value))
-        throw new Error(`${value} is not a valid IP address`);
-      else return value;
-    },
-    ServeArgs.defaults.host,
-  );
-}
-
-/* Adding the 'port' option to the serve command */ {
-  serve.option(
-    "-p, --port <int>",
-    "The port to listen on and serve the slides from.",
+  .command('serve [file]')
+  .description('compile and then serve on a webserver')
+  .action(serveFunctionWrapper)
+  .option(
+    '-H, --host <ip-address>',
+    'The host to use ports from.',
+    (value) => Host.parse(value),
+    ServeArgs.defaults.host
+  )
+  .option(
+    '-p, --port <int>',
+    'The port to listen on and serve the slides from.',
     (value) => Number(value),
-    ServeArgs.defaults.port,
+    ServeArgs.defaults.port
+  )
+  .option(
+    '-b, --base-path. <prefix>',
+    'The base path the serve from. If specified serve from that subdirectory.',
+    (value) => BasePath.parse(value),
+    ServeArgs.defaults.basePath
   );
-}
 
-/* Adding the 'port' option to the serve command */ {
-  serve.option(
-    "-r, --root <prefix>",
-    "The root prefix the serve on. If specified serve from that subdirectory.",
-    (value) => {
-      if (value.startsWith("/")) return value;
-      else throw new Error(`root paths must start with '/', but got ${value}`);
-    },
-    ServeArgs.defaults.root,
-  );
-}
-
-/* Try parsing the arguments */ {
-  if (import.meta.url === `file://${process.argv[1]}`) {
-    try {
-      // being run as main file, not imported.
-      program.parse(process.argv, { from: "node" });
-    } catch (error: any) {
-      if (error.code === "commander.unknownOption") process.exit(3);
-      if (error.code === "commander.missingArgument") process.exit(4);
-      if (error.code === "commander.invalidArgument") process.exit(5);
-      if (error.code === "commander.optionMissingArgument") process.exit(6);
-      if (error.code === "commander.helpDisplayed") process.exit(0);
-      if (error.code === "commander.version") process.exit(0);
-      process.exit(1);
-    }
+const fileIndex = 1;
+const isBeingExecuted = import.meta.url === `file://${process.argv[fileIndex]}`;
+if (isBeingExecuted) {
+  try {
+    program.parse(process.argv, { from: 'node' });
+  } catch (error: unknown) {
+    const EXIT_CODE = ExitCode.from(error);
+    process.exit(EXIT_CODE);
   }
 }
-
-// /* Adding watchers to all files included if needed */ {
-//   // if (options.watch) options.forEach(file => {
-
-//   // });
-//     fs.watch("./some-file.txt", (eventType, filename) => {
-//     console.log(`${filename} changed: ${eventType}`);
-//   });
-// }
-
-// if (!options.config) {
-//   console.error("The config is required");
-//   process.exit(1);
-// }
-
-// import yaml from 'yaml';
-
-// if (!process.argv[2]) {
-//   console.error(`Usage: ${process.argv[0]} ${process.argv[1]} <file.yml> <file.js> [export]`)
-//   process.exit(1);
-// }
-
-// process.argv[0] = path.resolve(process.argv[0]);
-// process.argv[1] = path.resolve(process.argv[1]);
-// process.argv[2] = path.resolve(process.argv[2]);
-// process.argv[3] = path.resolve(process.argv[3]);
-
-// console.debug("-", process.argv.join("\n- "));
-
-// const module = process.argv[3];
-// const result = await import(module);
-// const tag = result[process.argv[4] ?? "default"];
-// const input = process.argv[2];
-// const file = fs.readFileSync(input, "utf8");
-// const doc = yaml.parseDocument(file, { customTags: [tag] });
-
-// console.log("doc:", doc.toJSON());
