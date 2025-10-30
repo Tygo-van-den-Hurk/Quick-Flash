@@ -2,7 +2,7 @@
 
 import * as zod from 'zod';
 import { BasePath, type DeepReadonly, Host, LogLevel, Logger } from '#lib';
-import { CompileArgs, compile } from '#src/compile/index';
+import { CompileArgs, compileFromCliArgs } from '#src/compile/index';
 import FastGlob from 'fast-glob';
 import { ServeArgs } from '#src/serve';
 import chalk from 'chalk';
@@ -16,9 +16,9 @@ import yargs from 'yargs';
 const NAME = pkg.name
 const VERSION = pkg.version;
 const EPILOGUE = `
-For the documentation go to ${chalk.underline(pkg.homepage)}. You can report bugs or create request features by opening an 
-issue on ${chalk.underline(pkg.bugs.url)}, or even better yet a pull request. To see the source code for yourself, you can
-go to ${chalk.underline(pkg.repository.url)}.
+For the documentation go to ${chalk.underline.cyan(pkg.homepage)}. You can report bugs or create request features by opening an 
+issue on ${chalk.underline.cyan(pkg.bugs.url)}, or even better yet a pull request. To see the source code for yourself, you can
+go to ${chalk.underline.cyan(pkg.repository.url)}.
 `
   .split('\n')
   .map((line) => line.trim())
@@ -65,18 +65,18 @@ export const cli = yargs(hideBin(process.argv))
     type: 'string',
   })
 
-  .option('watch', {
-    alias: 'w',
-    default: false,
-    description: 'Watch the specified files, and rerun if they change.',
-    type: 'boolean',
-  })
-
   .option('verbose', {
     alias: 'V',
     default: 0,
     description: 'Whether to be more talkative. Makes it more verbose by one step one per flag.',
     type: 'count',
+  })
+
+  .option('color', {
+    choices: ["never", "auto", "always"],
+    default: "auto",
+    describe: 'Enable or disable color output.',
+    type: 'string',
   })
 
   // Middlewares
@@ -87,6 +87,13 @@ export const cli = yargs(hideBin(process.argv))
     const verbosity = LogLevel.toNumber(argv.logLevel) - argv.verbose;
     Logger.logLevel = LogLevel.fromNumber(verbosity);
     Logger.debug(`Set LogLevel to: ${Logger.logLevel}`);
+  })
+
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, prefer-arrow-callback
+  .middleware(function disableColor(argv): void {
+    // Set the color value
+    const disabled = 0;
+    if (argv.color === "never") chalk.level = disabled;
   })
 
   // Compile subcommand
@@ -114,7 +121,7 @@ export const cli = yargs(hideBin(process.argv))
 
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     async (args) => {
-      await compile(args as DeepReadonly<CompileArgs>);
+      await compileFromCliArgs(args as DeepReadonly<CompileArgs>);
     }
   )
 
