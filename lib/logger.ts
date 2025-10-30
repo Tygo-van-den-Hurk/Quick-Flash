@@ -45,7 +45,7 @@ export class Logger {
     [LogLevel.INFO]: STD_OUT,
     [LogLevel.DEBUG]: STD_OUT,
   };
-  
+
   /**
    * The functions to call depending on what level is set. Allows for setting a function of a particular level.
    */
@@ -65,14 +65,13 @@ export class Logger {
     return Logger.privateFunctions;
   }
 
-
   /**
    * The default function for each `LogLevel`.
    */
   public static get DEFAULT_FUNCTIONS(): Readonly<typeof Logger.PRIVATE_DEFAULT_FUNCTIONS> {
     return Object.freeze({ ...Logger.PRIVATE_DEFAULT_FUNCTIONS });
   }
-  
+
   /**
    * The default function for each `LogLevel`.
    */
@@ -81,7 +80,7 @@ export class Logger {
     // Now we have to update the functions being used, this does that:
     Logger.logLevel = LogLevel.fromNumber(LogLevel.toNumber(Logger.logLevel));
   }
-  
+
   /**
    * The level to log. Anything using a lower level is discarded.
    */

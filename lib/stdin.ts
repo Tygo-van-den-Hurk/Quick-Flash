@@ -28,7 +28,6 @@ export abstract class STDin {
    * Installs all `process.on(...)` listeners.
    */
   public static install(): void {
-
     /**
      * Restores the cursor to its original state and exits with a 1 exit code.
      */
