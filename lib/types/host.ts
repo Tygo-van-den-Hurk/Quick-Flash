@@ -4,13 +4,14 @@ const IP_V4_REGEX = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/u;
 
 const IDENTIFY_IP_V4 = function IDENTIFY_IP_V4(value: unknown): boolean {
   if (typeof value !== 'string') return false;
-  if (! IP_V4_REGEX.test(value)) return false;
-  for (const octet of value.split(".")) {
+  if (!IP_V4_REGEX.test(value)) return false;
+  for (const octet of value.split('.')) {
     const num = Number.parseInt(octet, 10);
-    const max = 255, min = 0;
+    const max = 255;
+    const min = 0;
     if (num < min || num > max) return false;
   }
-  
+
   return true;
 };
 
@@ -26,7 +27,6 @@ export type IP4Host = zod.infer<typeof IP_V4_PARSER>;
  */
 // eslint-disable-next-line @typescript-eslint/no-namespace, @typescript-eslint/no-redeclare
 export namespace IP4Host {
-
   /**
    * The parser to parse `IP4Host`s.
    */
@@ -44,7 +44,6 @@ export namespace IP4Host {
    */
   export const identify = IDENTIFY_IP_V4;
 }
-
 
 const IP_V6_REGEX = /^[0-9a-fA-F:]+$/u;
 
@@ -68,7 +67,6 @@ export type IP6Host = zod.infer<typeof IP_V6_PARSER>;
  */
 // eslint-disable-next-line @typescript-eslint/no-namespace, @typescript-eslint/no-redeclare
 export namespace IP6Host {
-
   /**
    * The parser to parse `IP4Host`s.
    */
