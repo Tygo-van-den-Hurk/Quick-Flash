@@ -20,6 +20,7 @@ export default defineConfig(
       "jsdoc/require-description": "error",
       "jsdoc/require-param": "off",
       "jsdoc/require-returns": "off",
+      "jsdoc/require-yields": "off",
       "jsdoc/require-jsdoc": [
         "error",
         {
@@ -67,6 +68,8 @@ export default defineConfig(
           "format": ["UPPER_CASE"],
         },
       ],
+      "max-statements": ["error", 15],
+      "@typescript-eslint/no-magic-numbers": [ "error", { "ignore": [0, 1] }, ],  
       "lines-around-comment": [
         "error",
         {
