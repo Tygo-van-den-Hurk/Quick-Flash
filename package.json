@@ -1,16 +1,16 @@
 {
-  "name": "quick-flash",
+  "name": "slyde",
   "version": "0.0.1",
   "description": "Make beautifully animated presentations from YAML.",
   "readme": "readme.md",
   "private": true,
   "repository": {
-    "url": "https://github.com/Tygo-van-den-Hurk/Quick-Flash"
+    "url": "https://github.com/Tygo-van-den-Hurk/Slyde"
   },
   "bugs": {
-    "url": "https://github.com/Tygo-van-den-Hurk/Quick-Flash/issues"
+    "url": "https://github.com/Tygo-van-den-Hurk/Slyde/issues"
   },
-  "homepage": "https://Tygo-van-den-Hurk.github.io/Quick-Flash",
+  "homepage": "https://Tygo-van-den-Hurk.github.io/Slyde",
   "maintainers": [
     "Tygo van den Hurk"
   ],
