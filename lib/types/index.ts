@@ -87,3 +87,10 @@ export type RequireAll<T> = {
 export type OptionalKeys<T> = {
   [K in keyof T as object extends Pick<T, K> ? K : never]: T[K];
 };
+
+/**
+ * Makes an object deeply readonly.
+ */
+export type DeepReadonly<T> = {
+  readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : Readonly<T[K]>;
+};
