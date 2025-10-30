@@ -1,9 +1,50 @@
-/* istanbul ignore file */
-
 export * from '#lib/types/base-path';
 export * from '#lib/types/exit-codes';
 export * from '#lib/types/host';
 export * from '#lib/types/log-level';
+
+/**
+ * The result enum HEAVILY inspired by rust.
+ */
+export type Result<T = void, E extends Error = Error> =
+  | { type: Readonly<'ok'>; ok: T }
+  | { type: Readonly<'error'>; error: E };
+
+/**
+ * The result enum HEAVILY inspired by rust.
+ */
+// eslint-disable-next-line @typescript-eslint/no-namespace, @typescript-eslint/no-redeclare
+export namespace Result {
+  /**
+   * Creates an `ok` result.
+   */
+  export function ok(): Result;
+
+  /**
+   * Creates an `ok` result.
+   */
+  export function ok<T>(value: T): Result<T>;
+
+  /**
+   * Creates an `ok` result.
+   */
+  export function ok<T>(value?: T): Result<T | void> {
+    return {
+      ok: value as T | void,
+      type: 'ok',
+    };
+  }
+
+  /**
+   * Creates an `error` result.
+   */
+  export const error = function error<T, E extends Error>(value: E): Result<T, E> {
+    return {
+      error: value,
+      type: 'error',
+    };
+  };
+}
 
 /**
  * Forces all optional properties to not be optional.
