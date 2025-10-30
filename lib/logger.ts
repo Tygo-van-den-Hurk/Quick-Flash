@@ -23,7 +23,7 @@ const STD_ERR: LogFunction = console.error;
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class Logger {
   /** The default log level for the logger. */
-  public static readonly DEFAULT_LOG_LEVEL: LogLevel = LogLevel.INFO;
+  public static readonly DEFAULT_LOG_LEVEL: LogLevel = LogLevel.WARN;
 
   /** A function that ignores all it's arguments. */
   public static readonly DEV_NULL: LogFunction = DEV_NULL;
