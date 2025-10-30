@@ -10,7 +10,7 @@
   "bugs": {
     "url": "https://github.com/Tygo-van-den-Hurk/Quick-Flash/issues"
   },
-  "homepage": "https://github.com/Tygo-van-den-Hurk/Quick-Flash",
+  "homepage": "https://Tygo-van-den-Hurk.github.io/Quick-Flash",
   "maintainers": [
     "Tygo van den Hurk"
   ],
@@ -47,6 +47,7 @@
     "ora": "^9.0.0",
     "xml-parser-xo": "^4.1.5",
     "yaml": "^2.8.1",
+    "yargs": "^18.0.0",
     "zod": "^4.1.12"
   },
   "type": "module",
@@ -59,6 +60,7 @@
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.5.2",
+    "@types/yargs": "^17.0.34",
     "@vitest/coverage-v8": "^3.2.4",
     "esbuild": "^0.25.11",
     "esbuild-plugin-alias": "^0.2.1",
@@ -73,4 +75,3 @@
     "vitest": "^3.2.4"
   }
 }
-  
