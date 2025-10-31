@@ -17,8 +17,12 @@ Slyde is a program to create professional beautifully animated presentations fro
   <slide title="Why you should use Slyde">
     <!-- These are my slide notes in case I forget what to say -->
     <point>It is super **fast and easy** to make slides</point>
-    <point>The animations are **gorgous**!</point>
+    <point>The animations are **gorgeous**!</point>
     <point>Recipient only needs a browser to open it</point>
   </slide>
 </presentation>
 ```
+
+This would output the following fully animated presentation:
+
+<img src="./docs/assets/example-presentation.gif" width="100%" alt="An example Slyde presentation based on the previous example XML template">
