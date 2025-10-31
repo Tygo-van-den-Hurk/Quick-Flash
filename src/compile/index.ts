@@ -53,7 +53,7 @@ export namespace CompileArgs {
  */
 export const compile = async function compile(
   args: DeepReadonly<CompileArgs>
-): Promise<Result<string>>  {
+): Promise<Result<string>> {
   const options = CompileArgs.fillUpWithDefaults(args);
 
   const readResult = await readInputFileFromDisk(options.file);
@@ -65,18 +65,21 @@ export const compile = async function compile(
   const stringified = await toHTML(parseResult.ok.root);
 
   return Result.ok(stringified);
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const writeToDisk = async function writeToDisk(resolved: PathLike, content: string): Promise<Result> {
+const writeToDisk = async function writeToDisk(
+  resolved: PathLike,
+  content: string
+): Promise<Result> {
   const spinner = ora({
     isSilent: LogLevel.of(Logger.logLevel).isLessVerboseThen(LogLevel.INFO),
     prefixText: chalk.cyan(LogLevel.INFO.toUpperCase()),
   }).start(`writing to disk...`);
-  
+
   try {
     await FileSystem.writeFile(resolved, content);
-    spinner.succeed(`${chalk.green("Success")}: wrote the result to disk!`);
+    spinner.succeed(`${chalk.green('Success')}: wrote the result to disk!`);
     return Result.ok();
   } catch (error) {
     if (error instanceof Error) {
@@ -89,7 +92,7 @@ const writeToDisk = async function writeToDisk(resolved: PathLike, content: stri
     spinner.fail(`${chalk.red(LogLevel.ERROR.toUpperCase())}: ${result.message}`);
     return Result.error(result);
   }
-}
+};
 
 /**
  * Compiles and then writes to the disk
@@ -99,8 +102,8 @@ export const compileFromCliArgs = async function compileFromCliArgs(
 ): Promise<Result> {
   const options = CompileArgs.fillUpWithDefaults(args);
   const compiledResult = await compile(options);
-  if (compiledResult.type === "error") throw compiledResult.error;
+  if (compiledResult.type === 'error') throw compiledResult.error;
   const writeResult = await writeToDisk(options.output, compiledResult.ok);
-  if (writeResult.type === "error") throw writeResult.error;
+  if (writeResult.type === 'error') throw writeResult.error;
   return writeResult;
 };
