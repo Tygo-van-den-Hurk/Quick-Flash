@@ -19,31 +19,31 @@ class CounterClass implements Counter {
 }
 
 const countElements = function countElements(
-  node: XmlParserElementChildNode, // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
-): number {  
+  node: XmlParserElementChildNode // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
+): number {
   if (node.type !== 'Element') return 1;
   const children = node.children ?? [];
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  return 1 + children.reduce((total:number, child): number => total + countElements(child), 0);
-}
+  return 1 + children.reduce((total: number, child): number => total + countElements(child), 0);
+};
 
 // eslint-disable-next-line max-lines-per-function, max-statements
 const recurse = async function recurse(
   node: XmlParserElementChildNode, // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
   counter: Counter, // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
-  spinner: Ora, // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
+  spinner: Ora // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
 ): Promise<string> {
-  
   counter.current += 1;
 
   if (node.type === 'CDATA') {
     spinner.text = `Converted ${counter.current} out of ${counter.total} components to HTML...`;
     return '';
   }
-  
-  if (node.type === 'Comment')  {
+
+  if (node.type === 'Comment') {
     spinner.text = `Converted ${counter.current} out of ${counter.total} components to HTML...`;
-    return node.content.trim()
+    return node.content
+      .trim()
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean)
@@ -76,7 +76,9 @@ const recurse = async function recurse(
   `;
 
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  const children = await Promise.all(node.children.map(async (child) => recurse(child, counter, spinner)));
+  const children = await Promise.all(
+    node.children.map(async (child) => recurse(child, counter, spinner))
+  );
   counter.current += 1;
 
   // eslint-disable-next-line no-inline-comments
@@ -86,7 +88,7 @@ const recurse = async function recurse(
         ${children.join('\n')}
       </${node.name}>
     </slyde-component>`;
-}
+};
 
 /**
  * Converts `XmlParserResult` to an HTML string.
@@ -95,7 +97,7 @@ const recurse = async function recurse(
 export const toHTML = async function toHTML(node: XmlParserElementChildNode): Promise<string> {
   const total = countElements(node);
   const counter = new CounterClass({ current: 0, total });
-  
+
   const spinner = ora({
     isSilent: LogLevel.of(Logger.logLevel).isLessVerboseThen(LogLevel.INFO),
     prefixText: chalk.cyan(LogLevel.INFO.toUpperCase()),
@@ -103,7 +105,9 @@ export const toHTML = async function toHTML(node: XmlParserElementChildNode): Pr
 
   const result = recurse(node, counter, spinner);
 
-  spinner.succeed(`${chalk.green("Success")}: Converted ${counter.current} out of ${counter.total} components to HTML!`);
+  spinner.succeed(
+    `${chalk.green('Success')}: Converted ${counter.current} out of ${counter.total} components to HTML!`
+  );
 
   return result;
 };

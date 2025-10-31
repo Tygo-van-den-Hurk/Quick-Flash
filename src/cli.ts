@@ -13,7 +13,7 @@ import yargs from 'yargs';
 
 // Helpers
 
-const NAME = pkg.name
+const NAME = pkg.name;
 const VERSION = pkg.version;
 const EPILOGUE = `
 For the documentation go to ${chalk.underline.cyan(pkg.homepage)}. You can report bugs or create request features by opening an 
@@ -33,7 +33,7 @@ const getStringOrLast = function getStringOrLast(value: string | readonly string
 
 // CLI arguments
 
-/** 
+/**
  * The root CLI argument parser.
  */
 export const cli = yargs(hideBin(process.argv))
@@ -41,9 +41,9 @@ export const cli = yargs(hideBin(process.argv))
   .wrap(null)
   .demandCommand(1, 'You need to specify a subcommand')
   .scriptName(NAME)
-  .version("version", "Show the program version, and then exit.", VERSION)
+  .version('version', 'Show the program version, and then exit.', VERSION)
   .alias('v', 'version')
-  .help("help", "Show this help message, and then exit.", true)
+  .help('help', 'Show this help message, and then exit.', true)
   .alias('h', 'help')
   .epilogue(EPILOGUE)
 
@@ -73,8 +73,8 @@ export const cli = yargs(hideBin(process.argv))
   })
 
   .option('color', {
-    choices: ["never", "auto", "always"],
-    default: "auto",
+    choices: ['never', 'auto', 'always'],
+    default: 'auto',
     describe: 'Enable or disable color output.',
     type: 'string',
   })
@@ -93,7 +93,7 @@ export const cli = yargs(hideBin(process.argv))
   .middleware(function disableColor(argv): void {
     // Set the color value
     const disabled = 0;
-    if (argv.color === "never") chalk.level = disabled;
+    if (argv.color === 'never') chalk.level = disabled;
   })
 
   // Compile subcommand
@@ -102,7 +102,8 @@ export const cli = yargs(hideBin(process.argv))
     'Compile and then write the results to disk.',
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types,
     (subYargs) =>
-      subYargs.epilogue(EPILOGUE)
+      subYargs
+        .epilogue(EPILOGUE)
 
         .option('output', {
           alias: 'o',
@@ -131,7 +132,8 @@ export const cli = yargs(hideBin(process.argv))
     'Compile and then serve the results on a webserver.',
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types,
     (subYargs) =>
-      subYargs.epilogue(EPILOGUE)
+      subYargs
+        .epilogue(EPILOGUE)
 
         .option('host', {
           alias: 'H',
@@ -151,9 +153,10 @@ export const cli = yargs(hideBin(process.argv))
 
         .option('base-path', {
           alias: 'B',
-          coerce: (value: string) => BasePath.parser.parse(value, {
-            error: () => `option '--base-path' must be a valid path starting with /`,
-          }),
+          coerce: (value: string) =>
+            BasePath.parser.parse(value, {
+              error: () => `option '--base-path' must be a valid path starting with /`,
+            }),
           default: ServeArgs.defaults.basePath,
           description: 'The base path to serve from. If specified, serve from that subdirectory.',
           type: 'string',
@@ -177,7 +180,6 @@ export const cli = yargs(hideBin(process.argv))
 
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types,, no-restricted-syntax
   .fail((message?: string, error?: Error) => {
-
     if (error) {
       Logger.critical(error.message);
       process.exit(1);
@@ -186,7 +188,6 @@ export const cli = yargs(hideBin(process.argv))
     Logger.critical('Invalid usage:', message);
     process.exit(1);
   });
-
 
 // If file is being executed instead of sourced:
 
