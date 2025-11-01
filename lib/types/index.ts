@@ -1,6 +1,4 @@
 export * from '#lib/types/base-path';
-export * from '#lib/types/exit-codes';
-export * from '#lib/types/host';
 export * from '#lib/types/log-level';
 
 /**

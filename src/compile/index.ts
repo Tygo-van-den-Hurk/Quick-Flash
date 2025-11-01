@@ -29,8 +29,8 @@ export namespace CompileArgs {
    * The defaults for the `CompileArgs` options to the `compile` function.
    */
   export const defaults = {
-    file: path.join(process.cwd(), 'slides.xml'),
-    output: path.join(process.cwd(), 'slides.html'),
+    file: path.join(process.cwd(), 'slyde.xml'),
+    output: path.join(process.cwd(), 'slyde.html'),
     plugins: [],
   } satisfies CompileArgs;
 
@@ -67,9 +67,8 @@ export const compile = async function compile(
   return Result.ok(stringified);
 };
 
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const writeToDisk = async function writeToDisk(
-  resolved: PathLike,
+  resolved: PathLike, // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
   content: string
 ): Promise<Result> {
   const spinner = ora({
