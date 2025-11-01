@@ -27,7 +27,6 @@ export class TitleSlide extends Component {
   public render({ children }: Readonly<Component.RenderArguments>): string {
     let authors = '';
 
-    // eslint-disable-next-line no-inline-comments
     if (this.authors)
       authors = /*HTML*/ `
       <p>

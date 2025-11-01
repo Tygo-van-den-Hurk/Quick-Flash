@@ -1,3 +1,6 @@
+import { FromPascalCase, } from '#lib/utils/index';
+import { Registerable } from '#lib/core/registry';
+
 /**
  * The arguments to provide to the constructor of a component.
  */
@@ -86,17 +89,27 @@ interface ComponentInterface extends ComponentConstructorArguments {
 /**
  * The base class of every concreet component.
  */
-export abstract class Component implements ComponentInterface {
+export abstract class Component implements ComponentInterface, Registerable {
   public readonly attributes;
   public readonly focusMode;
   public readonly level;
   public readonly path;
   public readonly id;
 
+  public readonly registerKeys;
+  
   /**
    * Creates a new `Component` from the arguments provided.
    */
   public constructor(args: Readonly<ComponentConstructorArguments>) {
+    this.registerKeys = () => [
+      new.target.name,
+      FromPascalCase.toKebabCase(new.target.name),
+      FromPascalCase.toSnakeCase(new.target.name),
+      new.target.name.toLowerCase(),
+      new.target.name.toUpperCase(),
+    ];
+
     this.attributes = args.attributes;
     this.focusMode = args.focusMode;
     this.level = args.level;
