@@ -1,4 +1,4 @@
-import { Logger } from '#lib';
+import { Logger } from '#lib/logger';
 import cliCursor from 'cli-cursor';
 import readline from 'readline';
 

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { LogLevel } from '#lib';
+import { LogLevel } from '#lib/types/log-level';
 import chalk from 'chalk';
 
 /** The exact type of `console.xyz()`. */
