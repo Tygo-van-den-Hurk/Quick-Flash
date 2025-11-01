@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import * as zod from 'zod';
-import { BasePath, type DeepReadonly, Host, LogLevel, Logger } from '#lib';
+import { BasePath, type DeepReadonly, LogLevel, Logger } from '#lib';
 import { CompileArgs, compileFromCliArgs } from '#src/compile/index';
+import { ServeArgs, serve } from '#src/serve';
 import FastGlob from 'fast-glob';
-import { ServeArgs } from '#src/serve';
 import chalk from 'chalk';
 import { hideBin } from 'yargs/helpers';
 import path from 'path';
@@ -29,6 +29,26 @@ go to ${chalk.underline.cyan(pkg.repository.url)}.
 const getStringOrLast = function getStringOrLast(value: string | readonly string[]): string {
   if (typeof value === 'string') return value;
   return value[value.length - 1];
+};
+
+/**
+ * Wraps a zod parsing function so that we can use the messages of the original
+ * instead of Yargs making my life harder.
+ */
+const wrapZodForCleanerError = function wrapZodForCleanerError<T>(name: string, arg0: () => T): T {
+  try {
+    return arg0();
+  } catch (error: unknown) {
+    if (error instanceof zod.ZodError) {
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      const issues = error.issues.map((issue) => issue.message).join(',');
+      const were = error.issues.length === 1 ? 'was' : 'were'; // eslint-disable-line no-ternary
+      const s = error.issues.length === 1 ? '' : 's'; // eslint-disable-line no-ternary, id-length
+      const message = `There ${were} ${error.issues.length} ${chalk.red(`issue${s}`)} with ${name}: ${issues}`;
+      throw new Error(message, { cause: error });
+    }
+    throw error;
+  }
 };
 
 // CLI arguments
@@ -59,7 +79,8 @@ export const cli = yargs(hideBin(process.argv))
   .option('log-level', {
     alias: 'l',
     choices: LogLevel.options,
-    coerce: (value: string | readonly string[]) => LogLevel.parser.parse(getStringOrLast(value)),
+    coerce: (value: string | readonly string[]) =>
+      wrapZodForCleanerError('--log-level/-l', () => LogLevel.parser.parse(getStringOrLast(value))),
     default: Logger.DEFAULT_LOG_LEVEL,
     description: `Log level to use when running.`,
     type: 'string',
@@ -137,7 +158,10 @@ export const cli = yargs(hideBin(process.argv))
 
         .option('host', {
           alias: 'H',
-          coerce: (value: string | readonly string[]) => Host.parser.parse(getStringOrLast(value)),
+          coerce: (value: string | readonly string[]) =>
+            wrapZodForCleanerError('--host/-H', () =>
+              zod.ipv4().or(zod.ipv6()).parse(getStringOrLast(value))
+            ),
           default: ServeArgs.defaults.host,
           description: 'The host to use ports from.',
           type: 'string',
@@ -145,7 +169,8 @@ export const cli = yargs(hideBin(process.argv))
 
         .option('port', {
           alias: 'P',
-          coerce: (value: string | number) => zod.number().parse(value),
+          coerce: (value: string | number) =>
+            wrapZodForCleanerError('--port/-P', () => zod.int().parse(value)),
           default: ServeArgs.defaults.port,
           description: 'The port to listen on and serve the slides from.',
           type: 'number',
@@ -154,9 +179,7 @@ export const cli = yargs(hideBin(process.argv))
         .option('base-path', {
           alias: 'B',
           coerce: (value: string) =>
-            BasePath.parser.parse(value, {
-              error: () => `option '--base-path' must be a valid path starting with /`,
-            }),
+            wrapZodForCleanerError('--base-path/-B', () => BasePath.parser.parse(value)),
           default: ServeArgs.defaults.basePath,
           description: 'The base path to serve from. If specified, serve from that subdirectory.',
           type: 'string',
@@ -170,9 +193,8 @@ export const cli = yargs(hideBin(process.argv))
         }),
 
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-    (args) => {
-      Logger.critical('serve', args);
-      // Temp: await mergeArgsAndExec(command, serveFile);
+    async (args) => {
+      await serve({ ...args, output: '' });
     }
   )
 
@@ -182,6 +204,7 @@ export const cli = yargs(hideBin(process.argv))
   .fail((message?: string, error?: Error) => {
     if (error) {
       Logger.critical(error.message);
+      Logger.debug(error.stack);
       process.exit(1);
     }
 

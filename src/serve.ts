@@ -1,6 +1,8 @@
-import { BasePath, Host, Logger, type RequireAll } from '#lib';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import * as zod from 'zod';
+import { BasePath, Logger, type RequireAll } from '#lib';
+import { CompileArgs, compile } from '#src/compile/index';
 import express, { type Request, type Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * The default callback when none has been defined.
@@ -19,7 +21,7 @@ const callback = function callback(
 /**
  * The possible options you can provide to the `serve` function.
  */
-export interface ServeArgs {
+export interface ServeArgs extends CompileArgs {
   /**
    * The base path to serve from. Allows you to serve from e.g. the `/presentation` subdirectory.
    * So you'd have to request `https://example.com/presentation` to get the presentation.
@@ -34,7 +36,7 @@ export interface ServeArgs {
   /**
    * The host to respond on.
    */
-  host?: Host;
+  host?: string;
 
   /**
    * The callback to execute when starting the server
@@ -51,9 +53,10 @@ export namespace ServeArgs {
    * The defaults for the `ServeArgs` options to the `serve` function.
    */
   export const defaults = {
+    ...CompileArgs.defaults,
     basePath: BasePath.parse('/'),
     callback,
-    host: Host.parse('0.0.0.0'),
+    host: zod.ipv4().parse('0.0.0.0'),
     port: 8484,
   } satisfies RequireAll<ServeArgs>;
 
@@ -64,6 +67,7 @@ export namespace ServeArgs {
     options: Readonly<ServeArgs> = defaults
   ): RequireAll<ServeArgs> {
     return {
+      ...CompileArgs.fillUpWithDefaults(options),
       basePath: options.basePath ?? defaults.basePath,
       callback: options.callback ?? defaults.callback,
       host: options.host ?? defaults.host,
@@ -71,6 +75,8 @@ export namespace ServeArgs {
     } satisfies RequireAll<ServeArgs>;
   };
 }
+
+let compiled: string | undefined = '';
 
 /**
  * Serves the responds to the client.
@@ -80,17 +86,19 @@ export const serveResult = function serveResult(
   response: Response // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
 ): Response {
   Logger.info(`request made for ${request.url} from ${request.ip}`);
-  return response.status(StatusCodes.OK).json({
-    message: ReasonPhrases.OK,
-    status: StatusCodes.OK,
-  });
+  return response.status(StatusCodes.OK).send(compiled);
 };
 
 /**
  * Compiles and then serves the result
  */
-export const serve = function serve(args: Readonly<ServeArgs> = ServeArgs.defaults): void {
+export const serve = async function serve(
+  args: Readonly<ServeArgs> = ServeArgs.defaults
+): Promise<void> {
   const options = ServeArgs.fillUpWithDefaults(args);
+  const result = await compile(options);
+  if (result.type !== 'ok') throw result.error;
+  compiled = result.ok;
   const router = Router(); // eslint-disable-line new-cap
   router.get(/.*/u, serveResult);
   const app = express();

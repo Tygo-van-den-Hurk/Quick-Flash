@@ -34,6 +34,7 @@ const recurse = async function recurse(
   spinner: Ora // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
 ): Promise<string> {
   counter.current += 1;
+  const id = counter.current;
 
   if (node.type === 'CDATA') {
     spinner.text = `Converted ${counter.current} out of ${counter.total} components to HTML...`;
@@ -42,12 +43,16 @@ const recurse = async function recurse(
 
   if (node.type === 'Comment') {
     spinner.text = `Converted ${counter.current} out of ${counter.total} components to HTML...`;
-    return node.content
+    // eslint-disable-next-line no-inline-comments
+    return /*HTML*/ `
+    <!-- ${id} -->
+    ${node.content
       .trim()
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean)
-      .join('\n');
+      .join('\n')}
+    <!-- ${id} -->`;
   }
 
   if (node.type === 'ProcessingInstruction') {
@@ -57,12 +62,16 @@ const recurse = async function recurse(
 
   if (node.type === 'Text') {
     spinner.text = `Converted ${counter.current} out of ${counter.total} components to HTML...`;
-    return node.content
+    // eslint-disable-next-line no-inline-comments
+    return /*HTML*/ `
+    <!-- ${id} -->
+    ${node.content
       .trim()
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean)
-      .join('\n');
+      .join('\n')}
+    <!-- ${id} -->`;
   }
 
   const attrs = Object.keys(node.attributes)
@@ -75,15 +84,14 @@ const recurse = async function recurse(
     <${node.name} ${attrs}>
   `;
 
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   const children = await Promise.all(
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     node.children.map(async (child) => recurse(child, counter, spinner))
   );
-  counter.current += 1;
 
   // eslint-disable-next-line no-inline-comments
   return /*HTML*/ `
-    <slyde-component id="${counter.current}">
+    <slyde-component id="${id}">
       <${node.name}>
         ${children.join('\n')}
       </${node.name}>
