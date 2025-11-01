@@ -1,8 +1,8 @@
 ### Git Ignore list
 
 # Files for `Slyde`
-**/slide.xml
-**/slide.html
+**/slyde.xml
+**/slyde.html
 
 # pre-commit hook config
 .pre-commit-config.yaml
