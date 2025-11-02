@@ -132,3 +132,9 @@ export class SlydeMarkupRenderer implements MarkupRenderer {
     return true;
   }
 }
+
+/**
+ * The default `MarkupRenderer`, just a copy of `SlydeMarkupRenderer`.
+ */
+@MarkupRenderer.register
+export class DefaultMarkupRenderer extends SlydeMarkupRenderer {}
