@@ -8,6 +8,44 @@ import chalk from 'chalk';
 /** The exact type of `console.xyz()`. */
 type LogFunction = typeof console.info;
 
+/** The interface that any logger needs to implement */
+interface LogApi {
+  /**
+   * Prints to `stderr` with newline if `Logger.logLevel <= LogLevel.CRITICAL`. Multiple arguments can be passed, with
+   * the first used as the primary message and all additional used as substitution values similar to printf (the
+   * arguments are all passed to `util.format()`).
+   */
+  critical: LogFunction;
+
+  /**
+   * Prints to `stderr` with newline if `Logger.logLevel <= LogLevel.ERROR`. Multiple arguments can be passed, with
+   * the first used as the primary message and all additional used as substitution values similar to printf (the
+   * arguments are all passed to `util.format()`).
+   */
+  error: LogFunction;
+
+  /**
+   * Prints to `stderr` with newline if `Logger.logLevel <= LogLevel.WARN`. Multiple arguments can be passed, with
+   * the first used as the primary message and all additional used as substitution values similar to printf (the
+   * arguments are all passed to `util.format()`).
+   */
+  warn: LogFunction;
+
+  /**
+   * Prints to `stdout` with newline if `Logger.logLevel <= LogLevel.INFO`. Multiple arguments can be passed, with
+   * the first used as the primary message and all additional used as substitution values similar to printf (the
+   * arguments are all passed to `util.format()`).
+   */
+  info: LogFunction;
+
+  /**
+   * Prints to `stdout` with newline if `Logger.logLevel <= LogLevel.INFO`. Multiple arguments can be passed, with
+   * the first used as the primary message and all additional used as substitution values similar to printf (the
+   * arguments are all passed to `util.format()`).
+   */
+  debug: LogFunction;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 const DEV_NULL: LogFunction = (_message, ..._optionalParams) => {};
 
@@ -182,6 +220,29 @@ export class Logger {
       message,
       ...optionalParams
     );
+  };
+
+  /**
+   * The API of the logger. Can be safely given to plugins or any arbitrary code without them being able to change
+   * the log level.
+   */
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  public static readonly API: LogApi = {
+    critical: (...args: unknown[]) => {
+      Logger.critical(args);
+    },
+    debug: (...args: unknown[]) => {
+      Logger.debug(args);
+    },
+    error: (...args: unknown[]) => {
+      Logger.error(args);
+    },
+    info: (...args: unknown[]) => {
+      Logger.info(args);
+    },
+    warn: (...args: unknown[]) => {
+      Logger.warn(args);
+    },
   };
 }
 
