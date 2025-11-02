@@ -122,6 +122,5 @@
         "test/**/*",
         "vitest.config.ts",
         "package.json",
-        "package-lock.json",
     ],
 }
