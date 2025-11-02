@@ -54,13 +54,15 @@ export abstract class Component implements ComponentInterface {
       printed = true;
     }
 
-    const names = [...new Set([
-      target.name,
-      FromPascalCase.toKebabCase(target.name),
-      FromPascalCase.toSnakeCase(target.name),
-      target.name.toLowerCase(),
-      target.name.toUpperCase(),
-    ])];
+    const names = [
+      ...new Set([
+        target.name,
+        FromPascalCase.toKebabCase(target.name),
+        FromPascalCase.toSnakeCase(target.name),
+        target.name.toLowerCase(),
+        target.name.toUpperCase(),
+      ]),
+    ];
 
     for (const name of names) {
       if (!printed && Component.registry[name])

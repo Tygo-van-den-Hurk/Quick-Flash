@@ -73,7 +73,7 @@ describe('class SlydeMarkup implements MarkupRender', () => {
       const result = new SlydeMarkupRenderer().render(input);
       expect(result).toBe(input);
     });
-    
+
     test('rendering multiple unclosed markers revert to literals', () => {
       const input = `${marker}${marker}bold ${nextMarker}${nextMarker}italic`;
       const result = new SlydeMarkupRenderer().render(input);
@@ -83,7 +83,9 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     test('rendering same marker cannot nest within itself', () => {
       const input = `${marker}${marker}outer ${marker}${marker}inner${marker}${marker} outer${marker}${marker}`;
       const result = new SlydeMarkupRenderer().render(input);
-      expect(result).toBe(`${tags[marker].open}outer ${marker}${marker}inner${tags[marker].close} outer${marker}${marker}`);
+      expect(result).toBe(
+        `${tags[marker].open}outer ${marker}${marker}inner${tags[marker].close} outer${marker}${marker}`
+      );
     });
 
     test('rendering same marker on different lines', () => {
@@ -97,7 +99,9 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     test('rendering adjacent markers', () => {
       const input = `${marker}${marker}bold${marker}${marker}${marker}${marker}more bold${marker}${marker}`;
       const result = new SlydeMarkupRenderer().render(input);
-      expect(result).toBe(`${tags[marker].open}bold${tags[marker].close}${tags[marker].open}more bold${tags[marker].close}`);
+      expect(result).toBe(
+        `${tags[marker].open}bold${tags[marker].close}${tags[marker].open}more bold${tags[marker].close}`
+      );
     });
 
     test('rendering escaped backslash before marker', () => {
@@ -115,7 +119,9 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     test('rendering mixed escaped and unescaped markers', () => {
       const input = `\\${marker}${marker}not styled${marker}${marker} ${marker}${marker}styled${marker}${marker}`;
       const result = new SlydeMarkupRenderer().render(input);
-      expect(result).toBe(`\\${marker}${marker}not styled${marker}${marker} ${tags[marker].open}styled${tags[marker].close}`);
+      expect(result).toBe(
+        `\\${marker}${marker}not styled${marker}${marker} ${tags[marker].open}styled${tags[marker].close}`
+      );
     });
 
     test('rendering marker followed immediately by escaped marker', () => {
@@ -123,13 +129,15 @@ describe('class SlydeMarkup implements MarkupRender', () => {
       const result = new SlydeMarkupRenderer().render(input);
       expect(result).toBe(`${tags[marker].open}\\${marker}${marker}text${tags[marker].close}`);
     });
-    
+
     // These markers have special properties.
     if (['``'].includes(`${nextMarker}${nextMarker}`)) {
       test('rendering markers in "code blocks" are literal', () => {
         const input = `${marker}${marker}code ${nextMarker}${nextMarker}bold${nextMarker}${nextMarker} ${prevMarker}${prevMarker}italic${prevMarker}${prevMarker}${marker}${marker}`;
         const result = new SlydeMarkupRenderer().render(input);
-        expect(result).toBe(`${tags[marker].open}code ${nextMarker}${nextMarker}bold${nextMarker}${nextMarker} ${prevMarker}${prevMarker}italic${prevMarker}${prevMarker}${tags[marker].close}`);
+        expect(result).toBe(
+          `${tags[marker].open}code ${nextMarker}${nextMarker}bold${nextMarker}${nextMarker} ${prevMarker}${prevMarker}italic${prevMarker}${prevMarker}${tags[marker].close}`
+        );
       });
 
       continue;
@@ -157,8 +165,9 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     test('rendering multiple properly nested markers', () => {
       const input = `${marker}${marker}word ${nextMarker}${nextMarker}word ${prevMarker}${prevMarker}word${prevMarker}${prevMarker}${nextMarker}${nextMarker}${marker}${marker}`;
       const result = new SlydeMarkupRenderer().render(input);
-      expect(result).toBe(`${tags[marker].open}word ${tags[nextMarker].open}word ${tags[prevMarker].open}word${tags[prevMarker].close}${tags[nextMarker].close}${tags[marker].close}`);
+      expect(result).toBe(
+        `${tags[marker].open}word ${tags[nextMarker].open}word ${tags[prevMarker].open}word${tags[prevMarker].close}${tags[nextMarker].close}${tags[marker].close}`
+      );
     });
-
   }
 });

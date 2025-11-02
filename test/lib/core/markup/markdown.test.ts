@@ -2,7 +2,6 @@ import { describe, expect, test } from 'vitest';
 import { MarkdownRenderer } from '#lib';
 
 describe('class MarkdownRenderer implements MarkupRender', () => {
-
   test(`rendering an empty string to see if it stays a literal`, () => {
     const input = '';
     const result = new MarkdownRenderer().render(input);
@@ -53,7 +52,7 @@ describe('class MarkdownRenderer implements MarkupRender', () => {
     const result = new MarkdownRenderer().render(input);
     expect(result).toBe(input);
   });
-  
+
   test('rendering multiple unclosed markers revert to literals', () => {
     const input = `**bold *italic`;
     const result = new MarkdownRenderer().render(input);
