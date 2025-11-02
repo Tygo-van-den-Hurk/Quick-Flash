@@ -3,6 +3,8 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from "eslint-config-prettier";
 import { jsdoc } from 'eslint-plugin-jsdoc';
+import importPlugin from 'eslint-plugin-import';
+
 
 /**
  * The config for ESlint. A JavaScript, and TypeScript linter.
@@ -13,6 +15,35 @@ import { jsdoc } from 'eslint-plugin-jsdoc';
 export default defineConfig(
   eslint.configs.all,
   tseslint.configs.all,
+  {
+    files: [ 'src/**/*.ts', 'lib/**/*.ts'],
+    extends: [
+      importPlugin.flatConfigs.recommended, 
+      importPlugin.flatConfigs.typescript
+    ],
+    rules: {
+      "import/no-cycle": ["error", { 
+        maxDepth: Infinity,
+        ignoreExternal: true 
+      }],
+
+      "import/no-duplicates": "error",
+      "import/first": "error",
+      "import/newline-after-import": "error",
+      "import/no-useless-path-segments": ["error", { noUselessIndex: true }],
+      "import/no-default-export": "error",
+      "import/no-extraneous-dependencies": ["error", {
+        devDependencies: [
+          "**/*.test.ts",
+          "**/*.spec.ts",
+          "**/test/**",
+          "**/*.config.*"
+        ]
+      }],
+      "import/no-webpack-loader-syntax": "error",
+      "import/no-self-import": "error",
+    }
+  },
   jsdoc({
     config: "flat/recommended",
     files: [ 'src/**/*.ts', 'lib/**/*.ts'],
@@ -47,6 +78,14 @@ export default defineConfig(
     languageOptions: {
       parserOptions: {
         projectService: true,
+      },
+    },
+    settings: {
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.json',
+        },
       },
     },
     rules: {
