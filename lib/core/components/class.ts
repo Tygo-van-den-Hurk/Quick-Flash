@@ -5,6 +5,7 @@ import type {
 } from '#lib/core/components/interfaces';
 import { FromPascalCase } from '#lib/utils/switch-case';
 import { Logger } from '#lib/logger';
+import { isSubclass } from '#lib/utils/index';
 
 type ConstructableComponent = new (
   arg0: Readonly<ComponentConstructorArguments>
@@ -29,6 +30,7 @@ export abstract class Component implements ComponentInterface {
    * Creates a new `Component` from the arguments provided.
    */
   public constructor(args: Readonly<ComponentConstructorArguments>) {
+    Logger.debug(`constructing ${new.target.name} at ${args.path.join('.')}`)
     this.attributes = args.attributes;
     this.focusMode = args.focusMode;
     this.level = args.level;
@@ -48,6 +50,9 @@ export abstract class Component implements ComponentInterface {
   // eslint-disable-next-line no-restricted-syntax
   public static register = <T extends ConstructableComponent>(target: T): T => {
     let printed = false;
+
+    if (!isSubclass(target, this))
+      Logger.warn(`${target.name} does not extend ${Component.name}...`);
 
     if (Component.registry[target.name]) {
       Logger.warn(`The component ${target.name} is being overwritten...`);

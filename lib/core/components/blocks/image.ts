@@ -1,4 +1,4 @@
-/* eslint-disable-next-line max-classes-per-file */
+/* eslint-disable max-classes-per-file */
 import { Component } from '#lib/core/components/class';
 import { Logger } from '#lib/logger';
 
@@ -52,7 +52,7 @@ export class Image extends Component {
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public hierarchy(): ReturnType<Component['hierarchy']> {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    return [3, '+'];
+    return [2, '+'];
   }
 }
 
