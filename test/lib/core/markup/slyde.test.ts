@@ -10,8 +10,14 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     '^': { close: '</sup>', open: '<sup>' },
     _: { close: '</u>', open: '<u>' }, // eslint-disable-line id-length
     '`': { close: '</code>', open: '<code>' },
-    '~': { close: '</s>', open: '<s>' },
+    '~': { close: '</del>', open: '<del>' },
   };
+
+  test('rendering italic and urls', () => {
+    const input = `this is an HTTP URL: http://example.com/ this is an HTTPS URL: https://example.com/`;
+    const result = new SlydeMarkupRenderer().render(input);
+    expect(result).toBe(input);
+  });
 
   for (const marker of markers) {
     const nextMarker = markers[(markers.indexOf(marker) + 1) % markers.length];
@@ -74,11 +80,19 @@ describe('class SlydeMarkup implements MarkupRender', () => {
       expect(result).toBe(input);
     });
 
-    // test('rendering same marker cannot nest within itself', () => {
-    //   const input = `${marker}${marker}outer ${marker}${marker}inner${marker}${marker} outer${marker}${marker}`;
-    //   const result = new SlydeMarkupRenderer().render(input);
-    //   expect(result).toBe(`${tags[marker].open}outer ${marker}${marker}inner${tags[marker].close} outer${marker}${marker}`);
-    // });
+    test('rendering same marker cannot nest within itself', () => {
+      const input = `${marker}${marker}outer ${marker}${marker}inner${marker}${marker} outer${marker}${marker}`;
+      const result = new SlydeMarkupRenderer().render(input);
+      expect(result).toBe(`${tags[marker].open}outer ${marker}${marker}inner${tags[marker].close} outer${marker}${marker}`);
+    });
+
+    test('rendering same marker on different lines', () => {
+      const input = `${marker}${marker}line 1
+      line 2${marker}${marker}`;
+      const result = new SlydeMarkupRenderer().render(input);
+      expect(result).toBe(`${tags[marker].open}line 1
+      line 2${marker}${marker}`);
+    });
 
     test('rendering adjacent markers', () => {
       const input = `${marker}${marker}bold${marker}${marker}${marker}${marker}more bold${marker}${marker}`;
@@ -98,11 +112,11 @@ describe('class SlydeMarkup implements MarkupRender', () => {
       expect(result).toBe(input);
     });
 
-    // test('rendering mixed escaped and unescaped markers', () => {
-    //   const input = `\\${marker}${marker}not styled${marker}${marker} ${marker}${marker}styled${marker}${marker}`;
-    //   const result = new SlydeMarkupRenderer().render(input);
-    //   expect(result).toBe(`\\${marker}${marker}not styled${marker}${marker} ${tags[marker].open}styled${tags[marker].close}`);
-    // });
+    test('rendering mixed escaped and unescaped markers', () => {
+      const input = `\\${marker}${marker}not styled${marker}${marker} ${marker}${marker}styled${marker}${marker}`;
+      const result = new SlydeMarkupRenderer().render(input);
+      expect(result).toBe(`\\${marker}${marker}not styled${marker}${marker} ${tags[marker].open}styled${tags[marker].close}`);
+    });
 
     test('rendering marker followed immediately by escaped marker', () => {
       const input = `${marker}${marker}\\${marker}${marker}text${marker}${marker}`;
@@ -111,7 +125,7 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     });
     
     // These markers have special properties.
-    if (new SlydeMarkupRenderer().IGNORE_MARKERS_INSIDE.includes(`${marker}${marker}`)) {
+    if (['``'].includes(`${nextMarker}${nextMarker}`)) {
       test('rendering markers in "code blocks" are literal', () => {
         const input = `${marker}${marker}code ${nextMarker}${nextMarker}bold${nextMarker}${nextMarker} ${prevMarker}${prevMarker}italic${prevMarker}${prevMarker}${marker}${marker}`;
         const result = new SlydeMarkupRenderer().render(input);
@@ -138,7 +152,7 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     });
 
     // These markers have special properties.
-    if (new SlydeMarkupRenderer().IGNORE_MARKERS_INSIDE.includes(`${nextMarker}${nextMarker}`)) continue;
+    if (['``'].includes(`${nextMarker}${nextMarker}`)) continue;
 
     test('rendering multiple properly nested markers', () => {
       const input = `${marker}${marker}word ${nextMarker}${nextMarker}word ${prevMarker}${prevMarker}word${prevMarker}${prevMarker}${nextMarker}${nextMarker}${marker}${marker}`;
