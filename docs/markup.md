@@ -36,8 +36,9 @@ This markup is rendered automatically in the text of most components unless they
 
 There is support out of the box for replacing the default markup renderer implementation with any of your choice using plugins. The following Markup renders are installed by default:
 
-- Slyde (default)
-- Markdown
+- `Slyde` (default)
+- `Markdown`
+- `Plain` (Aliased under `Raw` and `Off`)
 
 To select the a different markup renderer for example Markdown, change the markup key:
 
@@ -51,6 +52,50 @@ To select the a different markup renderer for example Markdown, change the marku
 ```
 
 The text will now be treated as markdown instead of Slyde' markup. But since Slyde' markup supports more styles and is easier for most non-technical people to understand it is the default.
+
+## Switching it off
+
+You might not want the markup to be processed at all. In that case you have 3 options. You could switch the markup renderer to the `plain` named renderer. This one just returns the input without processing:
+
+```XML
+<text markup="plain">
+  **This text will NOT be bold**
+  __This text will NOT be underlined__
+  ~~This text will NOT be struck through~~
+  //This text will NOT be italic//
+  ^^This text will NOT be in superscript^^
+  ``This text will NOT be monospaced``
+</text>
+```
+
+or use a [processing instruction](./processing-instructions.md):
+
+```XML
+<?slyde markup="plain"?>
+<text>
+  **This text will NOT be bold**
+  __This text will NOT be underlined__
+  ~~This text will NOT be struck through~~
+  //This text will NOT be italic//
+  ^^This text will NOT be in superscript^^
+  ``This text will NOT be monospaced``
+</text>
+```
+
+Or you can use an XML CDATA tag:
+
+```XML
+<text><CDATA[[
+  **This text will NOT be bold**
+  __This text will NOT be underlined__
+  ~~This text will NOT be struck through~~
+  //This text will NOT be italic//
+  ^^This text will NOT be in superscript^^
+  ``This text will NOT be monospaced``
+]]></text>
+```
+
+A CDATA tag Does not modify the text in any way what so ever. It preserves even whitespace if that is important to you.
 
 ## Quirks
 
