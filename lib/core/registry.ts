@@ -51,7 +51,8 @@ export namespace Registry {
       ] as const;
 
       for (const name of names) {
-        if (!printed) Logger.warn(`The component ${name} is being overwritten...`);
+        if (!printed && registry[name]) Logger.warn(`The component ${name} is being overwritten...`);
+        Logger.debug(`Added component: ${name}`);
         registry[name] = target;
       }
 
@@ -106,7 +107,8 @@ export namespace Registry {
       ] as const;
 
       for (const name of names) {
-        if (!printed) Logger.warn(`The component ${name} is being overwritten...`);
+        if (!printed && registry[name]) Logger.warn(`The markup renderer ${name} is being overwritten...`);
+        Logger.debug(`Added markup renderer: ${name}`);
         registry[name] = target;
       }
 
