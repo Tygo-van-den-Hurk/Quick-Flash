@@ -141,8 +141,8 @@ export class Presentation extends Component {
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
           <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; script-src 'self' 'nonce-${NONCE}';">
           <!-- Links -->
-          <link rel="icon" content="${this.icon}">
-          <link rel="apple-touch-icon" content="${this.icon}">
+          <link rel="icon" href="${this.icon}">
+          <link rel="apple-touch-icon" href="${this.icon}">
           <!-- Style & Script -->
           <script nonce="${NONCE}"> /* JS ALLOWED */ </script>
           <style> 
@@ -167,6 +167,6 @@ export class Presentation extends Component {
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public hierarchy(): ReturnType<Component['hierarchy']> {
-    return [1];
+    return [0];
   }
 }

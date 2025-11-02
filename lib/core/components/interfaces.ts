@@ -33,7 +33,7 @@ export interface ComponentConstructorArguments {
    *
    * it is up to the component to look for them in the constructor and enforce that all required ones are there.
    */
-  attributes: Readonly<Record<string, string | undefined>>;
+  readonly attributes: Readonly<Record<string, string | undefined>>;
 
   /**
    * The path at which this element is located.
@@ -53,7 +53,7 @@ export interface ComponentConstructorArguments {
    *
    * Then presentation has a level of `0`, slide a level of `1`, and point a level of `2`.
    */
-  level: number;
+  readonly level: number;
 }
 
 /**
