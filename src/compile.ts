@@ -1,11 +1,11 @@
+import * as compiler from '#lib/core/compiler/index';
 import { type DeepReadonly, LogLevel, Logger, type RequireAll, Result } from '#lib';
 import { promises as FileSystem, type PathLike } from 'fs';
 import chalk from 'chalk';
 import ora from 'ora';
-import { parseInputContent } from '#src/compile/parse';
 import path from 'path';
-import { readInputFileFromDisk } from '#src/compile/read';
-import { toHTML } from '#src/compile/render';
+import prettier from "prettier";
+
 /**
  * The possible options you can provide to the `compile` function.
  */
@@ -48,25 +48,6 @@ export namespace CompileArgs {
   };
 }
 
-/**
- * Compiles a file by reading, parsing and then compiling the result.
- */
-export const compile = async function compile(
-  args: DeepReadonly<CompileArgs>
-): Promise<Result<string>> {
-  const options = CompileArgs.fillUpWithDefaults(args);
-
-  const readResult = await readInputFileFromDisk(options.file);
-  if (readResult.type === 'error') return readResult;
-
-  const parseResult = parseInputContent(readResult.ok);
-  if (parseResult.type === 'error') return parseResult;
-
-  const stringified = await toHTML(parseResult.ok.root);
-
-  return Result.ok(stringified);
-};
-
 const writeToDisk = async function writeToDisk(
   resolved: PathLike, // eslint-disable-line @typescript-eslint/prefer-readonly-parameter-types
   content: string
@@ -98,11 +79,18 @@ const writeToDisk = async function writeToDisk(
  */
 export const compileFromCliArgs = async function compileFromCliArgs(
   args: DeepReadonly<CompileArgs> = CompileArgs.defaults
-): Promise<Result> {
+): Promise<void> {
   const options = CompileArgs.fillUpWithDefaults(args);
-  const compiledResult = await compile(options);
-  if (compiledResult.type === 'error') throw compiledResult.error;
-  const writeResult = await writeToDisk(options.output, compiledResult.ok);
+  const content = compiler.io.readInput(options.file);
+  Logger.debug(`Read file ${options.file}:\n`, content);
+  const parsed = compiler.io.parseInput(content);
+  Logger.debug(`Parsed file ${options.file}`, parsed);
+  await compiler.io.loadPlugins(options.plugins);
+  Logger.debug(`Loaded ${options.plugins.length} plugins:`, options.plugins);
+  const rendered = compiler.render.render(parsed);
+  Logger.debug(`Rendered file ${options.file}`, rendered);
+  const formatted = await prettier.format(rendered, { parser: "html" });
+  Logger.debug(`Formatted result`, formatted);
+  const writeResult = await writeToDisk(options.output, formatted);
   if (writeResult.type === 'error') throw writeResult.error;
-  return writeResult;
 };

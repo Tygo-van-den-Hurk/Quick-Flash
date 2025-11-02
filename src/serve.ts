@@ -1,8 +1,9 @@
 import * as zod from 'zod';
-import { BasePath, Logger, type RequireAll } from '#lib';
-import { CompileArgs, compile } from '#src/compile/index';
+import { BasePath, Logger, type RequireAll, compiler } from '#lib';
 import express, { type Request, type Response, Router } from 'express';
+import { CompileArgs } from '#src/compile';
 import { StatusCodes } from 'http-status-codes';
+import prettier from "prettier";
 
 /**
  * The default callback when none has been defined.
@@ -76,7 +77,7 @@ export namespace ServeArgs {
   };
 }
 
-let compiled: string | undefined = '';
+const compiled: string | undefined = '';
 
 /**
  * Serves the responds to the client.
@@ -92,13 +93,22 @@ export const serveResult = function serveResult(
 /**
  * Compiles and then serves the result
  */
+// eslint-disable-next-line max-statements
 export const serve = async function serve(
   args: Readonly<ServeArgs> = ServeArgs.defaults
 ): Promise<void> {
   const options = ServeArgs.fillUpWithDefaults(args);
-  const result = await compile(options);
-  if (result.type !== 'ok') throw result.error;
-  compiled = result.ok;
+  const content = compiler.io.readInput(options.file);
+  Logger.debug(`Read file ${options.file}:\n`, content);
+  const parsed = compiler.io.parseInput(content);
+  Logger.debug(`Parsed file ${options.file}`, parsed);
+  await compiler.io.loadPlugins(options.plugins);
+  Logger.debug(`Loaded ${options.plugins.length} plugins:`, options.plugins);
+  const rendered = compiler.render.render(parsed);
+  Logger.debug(`Rendered file ${options.file}`, rendered);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  const formatted = await prettier.format(rendered, { parser: "html" });
+  Logger.debug(`Formatted result`, formatted);
   const router = Router(); // eslint-disable-line new-cap
   router.get(/.*/u, serveResult);
   const app = express();

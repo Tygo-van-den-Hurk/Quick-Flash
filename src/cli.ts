@@ -2,7 +2,7 @@
 
 import * as zod from 'zod';
 import { BasePath, type DeepReadonly, LogLevel, Logger } from '#lib';
-import { CompileArgs, compileFromCliArgs } from '#src/compile/index';
+import { CompileArgs, compileFromCliArgs } from '#src/compile';
 import { ServeArgs, serve } from '#src/serve';
 import FastGlob from 'fast-glob';
 import chalk from 'chalk';
