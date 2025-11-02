@@ -10,7 +10,7 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     '^': { close: '</sup>', open: '<sup>' },
     _: { close: '</u>', open: '<u>' }, // eslint-disable-line id-length
     '`': { close: '</code>', open: '<code>' },
-    '~': { close: '</del>', open: '<del>' },
+    '~': { close: '</s>', open: '<s>' },
   };
 
   test('rendering italic and urls', () => {
