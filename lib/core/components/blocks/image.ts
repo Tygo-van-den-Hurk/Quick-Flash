@@ -1,10 +1,11 @@
-// eslint-disable-next-line max-classes-per-file
-import { Component, Logger, Registry } from '#lib';
+/* eslint-disable-next-line max-classes-per-file */
+import { Component } from '#lib/core/components/class';
+import { Logger } from '#lib/logger';
 
 /**
  * The `Image` component. Shows an image.
  */
-@Registry.Component.add
+@Component.register
 export class Image extends Component {
   /**
    * The source of the image.
@@ -58,7 +59,7 @@ export class Image extends Component {
 /**
  * The `img` component. Shows an image. Alias for `Image`
  */
-@Registry.Component.add
+@Component.register
 export class Img extends Image {
   // Just functions as an alias to <image>.
 }

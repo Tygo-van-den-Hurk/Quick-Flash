@@ -1,9 +1,9 @@
-import { Component, Registry } from '#lib';
+import { Component } from '#lib/core/components/class';
 
 /**
  * A `Slide` with on it a call to ask questions to the presentor.
  */
-@Registry.Component.add
+@Component.register
 export class QuestionSlide extends Component {
   /** The title of this slide. */
   public readonly title: string;

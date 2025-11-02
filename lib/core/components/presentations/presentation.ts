@@ -1,4 +1,8 @@
-import { Component, Registry } from '#lib';
+import { Component } from '#lib/core/components/class';
+import { randomBytes } from 'crypto';
+
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+const NONCE = randomBytes(16).toString('base64');
 
 const DEFAULT_DESCRIPTION = 'This is a presentation made with Slyde.' as const;
 const DEFAULT_KEYWORDS = 'Slyde, presentation' as const;
@@ -59,7 +63,7 @@ dmc+Cg==`.replace(/[\s\n]+/gu, '');
 /**
  * The encompassing `Presentation` object. Should hold all slides.
  */
-@Registry.Component.add
+@Component.register
 export class Presentation extends Component {
   /** The title of this presentation. */
   public readonly title: string;
@@ -135,10 +139,12 @@ export class Presentation extends Component {
           <meta name="msapplication-TileColor" content="${this.background}" />
           <meta name="theme-color" content="${this.accent}" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+          <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; script-src 'self' 'nonce-${NONCE}';">
           <!-- Links -->
           <link rel="icon" content="${this.icon}">
           <link rel="apple-touch-icon" content="${this.icon}">
           <!-- Style & Script -->
+          <script nonce="${NONCE}"> /* JS ALLOWED */ </script>
           <style> 
             :root { 
               --background-color: "${this.background}";

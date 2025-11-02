@@ -1,37 +1,39 @@
 import { Marked } from 'marked';
-import type { MarkupRenderer } from '#lib/core/markup/index';
-import { Registry } from '#lib/core/registry';
+import { MarkupRenderer } from '#lib/core/markup/interfaces';
+
+const disregard: () => string = () => '';
 
 const parser = new Marked({
   breaks: false,
   gfm: true,
   renderer: {
-    heading({ }) { return ''; },
-    paragraph({ tokens }) { 
+    blockquote: disregard,
+    heading: disregard,
+    hr: disregard,
+    html: disregard,
+    image: disregard,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    link({ tokens }): string {
       return this.parser.parseInline(tokens);
     },
-    blockquote() { return ''; },
-    list() { return ''; },
-    listitem() { return ''; },
-    hr() { return ''; },
-    table() { return ''; },
-    tablerow() { return ''; },
-    tablecell() { return ''; },
-    html() { return ''; },
-    link({ tokens }) { 
+    list: disregard,
+    listitem: disregard,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    paragraph({ tokens }): string {
       return this.parser.parseInline(tokens);
     },
-    image() { return ''; },
-  }
+    table: disregard,
+    tablecell: disregard,
+    tablerow: disregard,
+  },
 });
 
 /**
  * A `MarkupRenderer` for Markdown.
  */
-@Registry.MarkupRenderer.add
+@MarkupRenderer.register
 export class MarkdownRenderer implements MarkupRenderer {
-  public readonly registerKeys = () => [ "Markdown" ];
-
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public render(input: string): string {
     return parser.parse(input, { async: false });
   }

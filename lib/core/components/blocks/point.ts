@@ -1,5 +1,5 @@
 import * as zod from 'zod';
-import { Component, Registry } from '#lib';
+import { Component } from '#lib/core/components/class';
 
 const typeOptions = ['circle', 'dash', 'star'] as const;
 const typeParser = zod.enum(typeOptions).default('dash');
@@ -7,7 +7,7 @@ const typeParser = zod.enum(typeOptions).default('dash');
 /**
  * A component that just shows bullet point.
  */
-@Registry.Component.add
+@Component.register
 export class Point extends Component {
   public readonly type: zod.infer<typeof typeParser>;
 
