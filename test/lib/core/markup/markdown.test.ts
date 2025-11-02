@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { MarkdownRenderer } from '#lib';
+import { MarkdownRenderer } from '#lib/core/markup/markdown';
 
 describe('class MarkdownRenderer implements MarkupRender', () => {
   test(`rendering an empty string to see if it stays a literal`, () => {
