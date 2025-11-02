@@ -1,9 +1,9 @@
-import { Component, Registry } from '#lib';
+import { Component } from '#lib/core/components/class';
 
 /**
  * A component that just shows text.
  */
-@Registry.Component.add
+@Component.register
 export class Text extends Component {
   // eslint-disable-next-line jsdoc/require-jsdoc
   public constructor(args: Readonly<Component.ConstructorArguments>) {

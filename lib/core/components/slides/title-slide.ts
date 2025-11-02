@@ -1,9 +1,9 @@
-import { Component, Registry } from '#lib';
+import { Component } from '#lib/core/components/class';
 
 /**
  * A `Slide` with the title and possibly the author
  */
-@Registry.Component.add
+@Component.register
 export class TitleSlide extends Component {
   /** The title of this slide. */
   public readonly title: string;
@@ -27,12 +27,7 @@ export class TitleSlide extends Component {
   public render({ children }: Readonly<Component.RenderArguments>): string {
     let authors = '';
 
-    if (this.authors)
-      authors = /*HTML*/ `
-      <p>
-        ${this.authors.join('<br>')}
-      </p>
-    `;
+    if (this.authors) authors = `<p>${this.authors.join('<br>')}</p>`;
 
     // eslint-disable-next-line no-inline-comments
     return /*HTML*/ `

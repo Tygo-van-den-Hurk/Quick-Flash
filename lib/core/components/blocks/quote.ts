@@ -1,9 +1,10 @@
-import { Component, Logger, Registry } from '#lib';
+import { Component } from '#lib/core/components/class';
+import { Logger } from '#lib/logger';
 
 /**
  * The `Quote` component. Shows a quote by somebody.
  */
-@Registry.Component.add
+@Component.register
 export class Quote extends Component {
   /**
    * Who said the quote.

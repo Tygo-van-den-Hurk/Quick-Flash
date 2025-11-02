@@ -1,9 +1,9 @@
-import { Component, Registry } from '#lib';
+import { Component } from '#lib/core/components/class';
 
 /**
  * The `Slide` object. Should be the standard 2nd tier object.
  */
-@Registry.Component.add
+@Component.register
 export class Slide extends Component {
   /** The title of this slide. */
   public readonly title?: string;

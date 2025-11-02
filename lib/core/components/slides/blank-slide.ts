@@ -1,10 +1,10 @@
-import { Component, Registry } from '#lib';
+import { Component } from '#lib/core/components/class';
 
 /**
  * The `Slide` object. Should be the standard 2nd tier object.
  */
-@Registry.Component.add
-export class BlackSlide extends Component {
+@Component.register
+export class BlankSlide extends Component {
   // eslint-disable-next-line jsdoc/require-jsdoc
   public constructor(args: Readonly<Component.ConstructorArguments>) {
     super(args);
@@ -14,7 +14,7 @@ export class BlackSlide extends Component {
   public render({ children }: Readonly<Component.RenderArguments>): string {
     if (children) {
       throw new Error(
-        `Expected ${BlackSlide.name} at ${this.path.join('.')} to not have children, but found some.`
+        `Expected ${BlankSlide.name} at ${this.path.join('.')} to not have children, but found some.`
       );
     }
 
