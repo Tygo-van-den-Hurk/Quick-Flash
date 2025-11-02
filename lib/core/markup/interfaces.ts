@@ -32,18 +32,20 @@ export namespace MarkupRenderer {
       Logger.warn(`The markup renderer ${target.name} is being overwritten...`);
     }
 
-    const names = [...new Set([
-      target.name,
-      FromPascalCase.toKebabCase(target.name),
-      FromPascalCase.toSnakeCase(target.name),
-      target.name.toLowerCase(),
-      target.name.toUpperCase(),
-      target.name.replace(/(?:renderer|markup)/gui, ""),
-      FromPascalCase.toKebabCase(target.name.replace(/(?:renderer|markup)/gui, "")),
-      FromPascalCase.toSnakeCase(target.name.replace(/(?:renderer|markup)/gui, "")),
-      target.name.replace(/(?:renderer|markup)/gui, "").toLowerCase(),
-      target.name.replace(/(?:renderer|markup)/gui, "").toUpperCase(),
-    ])];
+    const names = [
+      ...new Set([
+        target.name,
+        FromPascalCase.toKebabCase(target.name),
+        FromPascalCase.toSnakeCase(target.name),
+        target.name.toLowerCase(),
+        target.name.toUpperCase(),
+        target.name.replace(/(?:renderer|markup)/giu, ''),
+        FromPascalCase.toKebabCase(target.name.replace(/(?:renderer|markup)/giu, '')),
+        FromPascalCase.toSnakeCase(target.name.replace(/(?:renderer|markup)/giu, '')),
+        target.name.replace(/(?:renderer|markup)/giu, '').toLowerCase(),
+        target.name.replace(/(?:renderer|markup)/giu, '').toUpperCase(),
+      ]),
+    ];
 
     for (const name of names) {
       if (!printed && registry[name])

@@ -27,7 +27,6 @@ export class SlydeMarkupRenderer implements MarkupRenderer {
   public readonly IGNORE_MARKERS_INSIDE = ['``'];
   public readonly NON_NESTABLE_MARKERS = Object.keys(this.MARKERS);
 
-   
   public render(input: string): string {
     const stack: Marker[] = [];
     let output = '';
@@ -113,7 +112,7 @@ export class SlydeMarkupRenderer implements MarkupRenderer {
   private canOpenMarker(marker: string, stack: DeepReadonly<Marker[]>): boolean {
     if (!stack.length) return true;
     const topMarker = stack[stack.length - 1];
-     
+
     if (!topMarker) return true;
     const top = topMarker.marker;
 
