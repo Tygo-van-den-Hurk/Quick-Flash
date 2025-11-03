@@ -4,6 +4,7 @@ import { randomBytes } from 'crypto';
 // eslint-disable-next-line @typescript-eslint/no-magic-numbers
 const NONCE = randomBytes(16).toString('base64');
 
+const DEFAULT_TITLE = 'Untitled Presentation' as const;
 const DEFAULT_DESCRIPTION = 'This is a presentation made with Slyde.' as const;
 const DEFAULT_KEYWORDS = 'Slyde, presentation' as const;
 const DEFAULT_AUTHOR = process.env.USER ?? process.env.USERNAME ?? 'an unknown author';
@@ -102,22 +103,14 @@ export class Presentation extends Component {
     this.foreground =
       args.attributes.foreground ?? args.attributes['foreground-color'] ?? DEFAULT_FOREGROUND;
     this.accent = args.attributes.accent ?? args.attributes['accent-color'] ?? DEFAULT_ACCENT;
-
-    if (typeof args.attributes.title === 'string') {
-      this.title = args.attributes.title;
-    } else {
-      throw new Error(
-        `Expected ${Presentation.name} at ${this.path.join('.')} to have attribute "title", ` +
-          `but found ${args.attributes.title}.`
-      );
-    }
+    this.title = args.attributes.title ?? DEFAULT_TITLE;
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
   public render({ children }: Readonly<Component.RenderArguments>): string {
     if (!children) {
       throw new Error(
-        `Expected ${Presentation.name} at ${this.path.join('.')} to have children, but found none.`
+        `${Component.name} ${Presentation.name} expected to have children, but found none at ${this.path.join('.')}.`
       );
     }
 

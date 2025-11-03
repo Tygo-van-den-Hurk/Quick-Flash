@@ -1,0 +1,12 @@
+{
+    "entryPoints": ["lib/**/*.ts"],
+    "out": "docs/api",
+    "highlightLanguages": [
+        "ts",
+        "js",
+        "xml",
+        "yaml",
+        "json"
+    ],
+}
+  

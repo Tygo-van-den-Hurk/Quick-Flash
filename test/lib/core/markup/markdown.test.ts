@@ -38,13 +38,13 @@ describe('class MarkdownRenderer implements MarkupRender', () => {
     expect(result1).toBe(`something not *<em>word</em>*`);
     const input2 = `something not *\\*word**`;
     const result2 = new MarkdownRenderer().render(input2);
-    expect(result2).toBe(`<em>*word</em>*`);
+    expect(result2).toBe(`something not <em>*word</em>*`);
     const input3 = `something not **word\\**`;
     const result3 = new MarkdownRenderer().render(input3);
-    expect(result3).toBe(input3);
+    expect(result3).toBe(`something not *<em>word*</em>`);
     const input4 = `something not **word*\\*`;
     const result4 = new MarkdownRenderer().render(input4);
-    expect(result4).toBe(input4);
+    expect(result4).toBe(`something not *<em>word</em>*`);
   });
 
   test('rendering unclosed marker reverts to literal', () => {
@@ -95,5 +95,23 @@ describe('class MarkdownRenderer implements MarkupRender', () => {
     const input = `\\**not styled** **styled**`;
     const result = new MarkdownRenderer().render(input);
     expect(result).toBe(`*<em>not styled</em>* <strong>styled</strong>`);
+  });
+
+  test('test link', () => {
+    const input = `[this](http://example.com)`;
+    const result = new MarkdownRenderer().render(input);
+    expect(result).toBe(`<a href="http://example.com">this</a>`);
+  });
+
+  test('filter out image', () => {
+    const input = `![this](http://example.com)`;
+    const result = new MarkdownRenderer().render(input);
+    expect(result).toBe(input);
+  });
+
+  test('filter out table', () => {
+    const input = `| Header |\n|--------|\n| entry  |`;
+    const result = new MarkdownRenderer().render(input);
+    expect(result).toBe(input);
   });
 });

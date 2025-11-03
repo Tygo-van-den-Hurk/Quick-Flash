@@ -43,7 +43,7 @@ export const cleanAndMergeAdjacentTextNodesRecurse = function cleanAndMergeAdjac
         next = input.children[index + 1];
       }
 
-      if (merged.length > 0)
+      if (merged.trim().length > 0)
         children.push({
           content: merged,
           type: 'Text',

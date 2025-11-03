@@ -41,9 +41,11 @@ export class Image extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render(): string {
+  public render({ children }: Readonly<Component.RenderArguments>): string {
     const description = this.description ?? '';
     const { source } = this;
+
+    if (children) throw new Error(`${Image.name} expected no children at ${this.path.join('.')}`);
 
     // eslint-disable-next-line no-inline-comments
     return /*HTML*/ `<img src="${source}" alt="${description}">`;

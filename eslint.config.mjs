@@ -130,6 +130,7 @@ export default defineConfig(
       "@typescript-eslint/no-unsafe-function-type": "off",
       "@typescript-eslint/no-unsafe-type-assertion": "off",
       "@typescript-eslint/no-magic-numbers": "off",
+      "max-lines-per-function": "off",
       "no-plusplus": "off"
     },
   },

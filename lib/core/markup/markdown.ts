@@ -1,30 +1,27 @@
 import { Marked } from 'marked';
 import { MarkupRenderer } from '#lib/core/markup/interfaces';
 
-const disregard: () => string = () => '';
+const getRaw: ({ raw }: Readonly<{ raw: string }>) => string = ({ raw }) => raw;
+const getText: ({ text }: Readonly<{ text: string }>) => string = ({ text }) => text;
 
 const parser = new Marked({
   breaks: false,
   gfm: true,
   renderer: {
-    blockquote: disregard,
-    heading: disregard,
-    hr: disregard,
-    html: disregard,
-    image: disregard,
-    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-    link({ tokens }): string {
-      return this.parser.parseInline(tokens);
-    },
-    list: disregard,
-    listitem: disregard,
+    blockquote: getRaw,
+    heading: getRaw,
+    hr: getRaw,
+    html: getRaw,
+    image: getRaw,
+    list: getRaw,
+    listitem: getRaw,
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     paragraph({ tokens }): string {
       return this.parser.parseInline(tokens);
     },
-    table: disregard,
-    tablecell: disregard,
-    tablerow: disregard,
+    table: getRaw,
+    tablecell: getText,
+    tablerow: getText,
   },
 });
 

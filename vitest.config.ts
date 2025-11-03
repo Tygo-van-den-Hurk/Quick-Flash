@@ -1,9 +1,14 @@
 import { configDefaults, defineConfig } from 'vitest/config'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
+  plugins: [tsconfigPaths()],
   test: {
     coverage: {
-      ignoreEmptyLines: true,
+      all: true,
+      include: ['lib/**/*.ts', 'src/**/*.ts'],
+      provider: 'istanbul',
+      reportOnFailure: true,
       skipFull: true,
       thresholds: {
         branches: 90,
