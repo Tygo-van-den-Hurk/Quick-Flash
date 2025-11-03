@@ -20,6 +20,9 @@
 # TypeDoc output
 **/docs/api
 
+# Tailwind output
+**/tailwind.output.css
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # ~~~ Find common git ignore templates at: https://github.com/github/gitignore ~~~ #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #

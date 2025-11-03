@@ -49,6 +49,7 @@
             "#lib": ["lib"], 
             "#lib/*": ["lib/*"], 
             "#package": ["./package.json"],
+            "#tailwind": ["./tailwind.config.js"],
         },                    
     
         /* JavaScript Support */
@@ -121,6 +122,7 @@
         "lib/**/*",
         "test/**/*",
         "vitest.config.ts",
-        "package.json", "defs",
+        "package.json",
+        "tailwind.config.js",
     ],
 }

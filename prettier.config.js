@@ -20,6 +20,8 @@ const config = {
   "embeddedLanguageFormatting": "auto", 
   "singleAttributePerLine": false, 
   "proseWrap": "preserve",
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindConfig": "tailwind.config.js"
 }
 
 export default config;

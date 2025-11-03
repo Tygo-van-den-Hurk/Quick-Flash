@@ -28,7 +28,8 @@
         "#src/*": "./dist/src/*.js",
         "#package": "./package.json",
         "#lib": "./dist/lib/index.js",
-        "#lib/*": "./dist/lib/*.js"
+        "#lib/*": "./dist/lib/*.js",
+        "#tailwind": "./tailwind.config.js"
     },
     "scripts": {
         "start": "node dist/src/cli.js",
@@ -45,6 +46,7 @@
         "format:write": "prettier '{src,lib,test}/**/*.{js,ts}' --write"
     },
     "dependencies": {
+        "@tailwindcss/cli": "^4.1.16",
         "chalk": "^5.6.2",
         "cli-cursor": "^5.0.0",
         "express": "^5.1.0",
@@ -53,7 +55,11 @@
         "http-status-codes": "^2.3.0",
         "marked": "^16.4.1",
         "ora": "^9.0.0",
+        "postcss": "^8.5.6",
         "prettier": "^3.6.2",
+        "prettier-plugin-tailwindcss": "^0.7.1",
+        "tailwindcss": "^4.1.16",
+        "twrnc": "^4.10.1",
         "xml-parser-xo": "^4.1.5",
         "yargs": "^18.0.0",
         "zod": "^4.1.12"
