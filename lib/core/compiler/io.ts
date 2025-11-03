@@ -1,7 +1,13 @@
 import * as FileSystem from 'fs';
 import * as path from 'path';
 import * as url from 'url';
-import parseXML, { ParsingError, type XmlParserResult } from 'xml-parser-xo';
+import parseXML, {
+  ParsingError,
+  type XmlParserDocumentChildNode,
+  type XmlParserElementChildNode,
+  type XmlParserElementNode,
+  type XmlParserResult,
+} from 'xml-parser-xo';
 import { Component } from '#lib/core/components/index';
 import { LogLevel } from '#lib/types/log-level';
 import { Logger } from '#lib/logger';
@@ -10,13 +16,77 @@ import chalk from 'chalk';
 import { oraPromise as ora } from 'ora';
 
 /**
+ * Given an XML `XmlParserElementNode` filters out text elements that when trimmed are blank.
+ * Merges text xml elements when they next to each other.
+ */
+export const cleanAndMergeAdjacentTextNodesRecurse = function cleanAndMergeAdjacentTextNodesRecurse(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  input: XmlParserElementNode
+): XmlParserElementNode {
+  const children: XmlParserElementChildNode[] = [];
+
+  input.children ??= [];
+  for (let index = 0; index < input.children.length; index += 1) {
+    const child = input.children[index];
+    if (child.type === 'Comment') children.push(child);
+    else if (child.type === 'CDATA') children.push(child);
+    else if (child.type === 'ProcessingInstruction') children.push(child);
+    else if (child.type === 'Element') children.push(cleanAndMergeAdjacentTextNodesRecurse(child));
+    else {
+      let merged = child.content.trim();
+      let next: undefined | XmlParserElementChildNode = input.children[index + 1];
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
+      while (next) {
+        if (next.type !== 'Text') break;
+        merged += ` ${next.content.trim()}`;
+        index += 1;
+        next = input.children[index + 1];
+      }
+
+      if (merged.length > 0)
+        children.push({
+          content: merged,
+          type: 'Text',
+        });
+    }
+  }
+
+  input.children = children;
+  return input;
+};
+
+/**
+ * Given an XML `XmlParserResult` filters out text elements that when trimmed are blank.
+ * Merges text xml elements when they next to each other.
+ */
+export const cleanAndMergeAdjacentTextNodes = function cleanAndMergeAdjacentTextNodes(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  input: XmlParserResult
+): XmlParserResult {
+  const root = cleanAndMergeAdjacentTextNodesRecurse(input.root);
+
+  const filterMap = function filterMap(
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    child: XmlParserDocumentChildNode
+  ): XmlParserDocumentChildNode {
+    // Replace our original ref to root, to the new root.
+    if (child.type === 'Element') return root;
+    return child;
+  };
+
+  const children: XmlParserDocumentChildNode[] = input.children.map(filterMap);
+  return { ...input, children, root };
+};
+
+/**
  * Parses a given string for XML, and returns the parsed result.
  */
 export const parseInput = function parseInput(content: string): XmlParserResult {
   try {
     const strictMode = true;
     const result = parseXML(content, { strictMode });
-    return result;
+    const cleaned = cleanAndMergeAdjacentTextNodes(result);
+    return cleaned;
   } catch (error: unknown) {
     if (error instanceof ParsingError)
       throw new Error(`${error.message}: ${error.cause}`, { cause: error });
