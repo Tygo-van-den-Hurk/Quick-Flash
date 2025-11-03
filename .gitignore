@@ -17,6 +17,9 @@
 # Compiled `Embedded TypeScript` files
 **/*.ets.ts
 
+# TypeDoc output
+**/docs/api
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # ~~~ Find common git ignore templates at: https://github.com/github/gitignore ~~~ #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #

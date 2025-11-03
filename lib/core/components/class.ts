@@ -30,12 +30,18 @@ export abstract class Component implements ComponentInterface {
    * Creates a new `Component` from the arguments provided.
    */
   public constructor(args: Readonly<ComponentConstructorArguments>) {
-    Logger.debug(`constructing ${new.target.name} at ${args.path.join('.')}`)
+    Logger.debug(`constructing ${new.target.name} at ${args.path.join('.')}`);
     this.attributes = args.attributes;
     this.focusMode = args.focusMode;
     this.level = args.level;
     this.path = args.path;
     this.id = args.id;
+    if (!this.canBeAtLevel(args.level)) {
+      throw new Error(
+        `${Component.name} ${new.target.name} cannot be at level ${this.level}. ` +
+          `Only at levels: ${this.hierarchy().toString()}`
+      );
+    }
   }
 
   /**
@@ -85,6 +91,23 @@ export abstract class Component implements ComponentInterface {
   public static keys = function keys(): readonly string[] {
     return Object.keys(Component.registry);
   };
+
+  // eslint-disable-next-line jsdoc/require-jsdoc
+  public canBeAtLevel(level: number): boolean {
+    const hierarchy = this.hierarchy();
+    if (hierarchy === '*') return true;
+    if (hierarchy.includes(level)) return true;
+
+    const hasPlus = hierarchy[hierarchy.length - 1] === '+';
+    // eslint-disable-next-line no-ternary
+    const numbers = hasPlus // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+      ? (hierarchy.slice(0, -1) as number[]) // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion
+      : (hierarchy as unknown as number[]); // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion
+    const highestNumber = Math.max(...numbers);
+    if (hasPlus && highestNumber < level) return true;
+
+    return false;
+  }
 
   public abstract hierarchy(): ReturnType<ComponentInterface['hierarchy']>;
   public abstract render(arg0: Readonly<Component.RenderArguments>): string;

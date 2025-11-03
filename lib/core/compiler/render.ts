@@ -12,21 +12,13 @@ import pkg from '#package' with { type: 'json' };
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Types ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
-/** Is used to keep count of how many components we've rendered thus far. */
-class Counter {
-  private count = 0;
-  public increment = (): void => {
-    this.count += 1;
-  };
-  public get = (): number => this.count;
-}
-
 /** The general rendering state. */
 interface State {
   path: readonly string[];
   level: number;
-  counter: Counter;
-  markup: MarkupRenderer;
+  index: number;
+  id: number;
+  markup: string;
 }
 
 interface Attribute {
@@ -79,29 +71,18 @@ export const createComponentInstance = function createComponentInstance(
   state: State
 ): Component {
   const ComponentInstance = Component.retrieve(element.name);
-  if (!ComponentInstance) throw new Error(`No such ${Component.name}: ${element.name}`);
+  if (!ComponentInstance)
+    throw new Error(`No such ${Component.name}: ${element.name} at ${state.path.join('.')}`);
 
   const instance = new ComponentInstance({
     attributes: { ...element.attributes },
     focusMode: 'default',
-    id: state.counter.get().toString(),
+    id: state.id.toString(),
     level: state.level,
     path: [...state.path],
   });
 
-  const hierarchy = instance.hierarchy();
-  if (hierarchy === '*') return instance;
-  if (hierarchy.includes(state.level)) return instance;
-  
-  const hasPlus = hierarchy[hierarchy.length - 1] === '+';
-  // eslint-disable-next-line no-ternary, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-magic-numbers
-  const numbers = hasPlus ? hierarchy.slice(0, -1) as number[] : hierarchy as unknown as number[];
-  const highestNumber = Math.max(...numbers);
-  if (hasPlus && highestNumber < state.level) return instance;
-
-  throw new Error(
-    `${Component.name} "${element.name}" cannot be at level ${state.level}. Only at levels: ${hierarchy.toString()}`
-  );
+  return instance;
 };
 
 /** Renders an XML comment element by looking up the current markup renderer, and then. */
@@ -110,13 +91,24 @@ export const useProcessingInstruction = function useProcessingInstruction(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   state: State
 ): State {
-  const attributes = getAttributes(element.content);
-  for (const attribute of attributes) {
-    if (attribute.name === 'markup') state.markup = getMarkupRenderer(attribute.value);
-    else
-      Logger.warn(
-        `Ignoring unknown Processing instruction '${attribute.name}="${attribute.value}"' at ${state.path.join('.')}.`
-      );
+  state.path = [...state.path, `[${state.index}]-XML-PROCESSING-INSTRUCTION`];
+
+  Logger.info(
+    `Received new processing instruction '${element.content}' at ${state.path.join('.')}`
+  );
+  if (element.name === pkg.name) {
+    const attributes = getAttributes(element.content);
+    for (const attribute of attributes) {
+      if (attribute.name === 'markup') state.markup = attribute.value;
+      else
+        Logger.warn(
+          `Ignoring unknown processing instruction '${attribute.name}="${attribute.value}"' at ${state.path.join('.')}.`
+        );
+    }
+  } else {
+    Logger.warn(
+      `Processing instruction ${state.path.join('.')} seems to be for ${element.name}, not ${pkg.name}. Ignoring instruction.`
+    );
   }
 
   return state;
@@ -130,8 +122,10 @@ export const renderText = function renderText(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   state: State
 ): string {
-  Logger.debug(`Rendering ${element.type} at ${state.path.join('.')}`)
-  return state.markup.render(element.content);
+  state.path = [...state.path, `[${state.index}]-XML-TEXT`];
+  Logger.debug(`Rendering ${element.type} at ${state.path.join('.')}`);
+  const renderer = getMarkupRenderer(state.markup);
+  return renderer.render(element.content);
 };
 
 /** Renders an XML comment element by looking up the current markup renderer, and then. */
@@ -140,8 +134,10 @@ export const renderComment = function renderComment(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   state: State
 ): string {
-  Logger.debug(`Rendering ${element.type} at ${state.path.join('.')}`)
-  return state.markup.render(element.content);
+  state.path = [...state.path, `[${state.index}]-XML-COMMENT`];
+  Logger.debug(`Rendering ${element.type} at ${state.path.join('.')}`);
+  const renderer = getMarkupRenderer(state.markup);
+  return renderer.render(element.content);
 };
 
 /** Renders an XML element by looking up the component by name, and then rendering it. */
@@ -152,55 +148,57 @@ export const renderElement = function renderElement(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   state: State
 ): string {
-  const instance = createComponentInstance(element, state);
-  if (element.attributes.markup) {
-    state.markup = getMarkupRenderer(element.attributes.markup);
-  }
+  state.path = [...state.path, `[${state.index}]-${element.name}`];
+  let thisState = { ...state };
+
+  const instance = createComponentInstance(element, thisState);
+  if (element.attributes.markup) thisState.markup = element.attributes.markup;
 
   const renderFunctions: (() => string)[] = [];
   for (const [index, child] of Array.from(element.children ?? []).entries()) {
-    
     if (child.type === 'CDATA') renderFunctions.push(() => child.content);
     else if (child.type === 'ProcessingInstruction') {
-      const path = [...state.path, `[${index}]-XML-PROCESSING-INSTRUCTION`].join('.');
-      Logger.info(`Received new ProcessingInstruction at ${path}: ${child.content}`);
-      if (element.name === pkg.name) {
-        state = useProcessingInstruction(child, state); // eslint-disable-line no-param-reassign
-        continue;
-      } else {
-        Logger.warn(
-          `Processing instruction ${path} seems to be for ${child.name}, not ${pkg.name}. Ignoring instruction.`
-        );
-      }
+      const path = [...thisState.path];
+      thisState = useProcessingInstruction(child, {
+        id: thisState.id + 1 + index,
+        index,
+        level: thisState.level + 1,
+        markup: thisState.markup,
+        path: [...thisState.path],
+      });
+      thisState.path = [...path];
     } else if (child.type === 'Element') {
       // eslint-disable-next-line @typescript-eslint/no-loop-func
       renderFunctions.push(() =>
         renderElement(child, {
-          counter: state.counter,
-          level: state.level + 1,
-          markup: state.markup,
-          path: [...state.path, `[${index}]-${child.name}`],
+          id: thisState.id + 1 + index,
+          index,
+          level: thisState.level + 1,
+          markup: thisState.markup,
+          path: [...thisState.path],
         })
       );
     } else if (child.type === 'Comment') {
-      // Comments should not be rendered as they are comments.
-      //// renderFunctions.push(
-      ////   () => renderComment(child, { // eslint-disable-line @typescript-eslint/no-loop-func
-      ////     counter: state.counter,
-      ////     level: state.level + 1,
-      ////     markup: state.markup,
-      ////     path: [...state.path, `[${index}]-XML-COMMENT`],
-      ////   })
-      //// );
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      renderFunctions.push(() =>
+        renderComment(child, {
+          id: thisState.id + 1 + index,
+          index,
+          level: thisState.level + 1,
+          markup: thisState.markup,
+          path: [...thisState.path],
+        })
+      );
     } else {
       // If (child.type === 'Text')
       // eslint-disable-next-line @typescript-eslint/no-loop-func
       renderFunctions.push(() =>
         renderText(child, {
-          counter: state.counter,
-          level: state.level + 1,
-          markup: state.markup,
-          path: [...state.path, `[${index}]-XML-TEXT`],
+          id: thisState.id + 1 + index,
+          index,
+          level: thisState.level + 1,
+          markup: thisState.markup,
+          path: [...thisState.path],
         })
       );
     }
@@ -217,12 +215,27 @@ export const renderElement = function renderElement(
     };
   }
 
-  Logger.debug(`Rendering ${element.name} at ${state.path.join('.')}`)
+  Logger.debug(`Rendering ${element.name} at ${state.path.join('.')}`);
+
+  // eslint-disable-next-line no-inline-comments
+  const wrapper = (inner: string): string => /*HTML*/ `
+    <slyde-component name="${element.name}" 
+      path="${state.path.join('.')}" 
+      id="slide-${state.id}" 
+      markup="${state.markup}"
+      level="${state.level}"
+    >
+      ${inner}
+    </slyde-component>
+  `;
+
   const result = instance.render({ children });
+
   if (!executed)
     Logger.warn(`${Component.name} ${element.name} did not call to render it's children.`);
 
-  return result;
+  if (state.level === 0) return result;
+  return wrapper(result);
 };
 
 /**
@@ -231,20 +244,28 @@ export const renderElement = function renderElement(
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 export const render = function render(tree: XmlParserResult): string {
   const level = 0;
-  const counter = new Counter();
-  const path = [`[0]-${tree.root.name}`];
-  const markup = getMarkupRenderer('default');
-  let state: State = { counter, level, markup, path };
-  for (const child of tree.children) {
+  const id = 0;
+  const markup = 'default';
+  let state: State = { id, index: 0, level, markup, path: [] };
+  for (const [index, child] of Array.from(tree.children).entries()) {
     if (child.type === 'DocumentType' && !child.content.includes(pkg.name)) {
+      Logger.info(`Found Document type: '${child.content}' at ${index}-XML-DOCTYPE`);
       Logger.warn(
         `The DocumentType ${child.content} does not seem to include ${pkg.name}.` +
           `Are you sure this document is ment for me?`
       );
     } else if (child.type === 'ProcessingInstruction') {
-      state = useProcessingInstruction(child, state);
+      state = useProcessingInstruction(child, {
+        ...state,
+        index,
+        path: [],
+      });
     } else if (child.type === 'Element') {
-      const result = renderElement(tree.root, state);
+      const result = renderElement(tree.root, {
+        ...state,
+        index,
+        path: [],
+      });
       Logger.info('Finished rendering');
       return result;
     }
