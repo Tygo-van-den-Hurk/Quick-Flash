@@ -21,8 +21,11 @@ interface State {
   markup: string;
 }
 
+/** An XML attribute pair. */
 interface Attribute {
+  /** The name of the attribute */
   name: string;
+  /** The value of the attribute */
   value: string;
 }
 
