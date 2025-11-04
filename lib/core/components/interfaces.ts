@@ -98,3 +98,10 @@ export interface ComponentInterface extends ComponentConstructorArguments {
    */
   canBeAtLevel: (level: number) => boolean;
 }
+
+/**
+ * Constraints on the constructor type of any `Component` for it to be considered registerable.
+ */
+export type ConstructableComponent = new (
+  arg0: Readonly<ComponentConstructorArguments>
+) => ComponentInterface;

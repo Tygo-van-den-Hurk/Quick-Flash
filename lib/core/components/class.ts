@@ -1,20 +1,43 @@
+import * as componentUtils from '#lib/core/components/utils';
 import type {
   ComponentConstructorArguments,
   ComponentInterface,
   ComponentRenderArguments,
+  ConstructableComponent,
 } from '#lib/core/components/interfaces';
 import { FromPascalCase } from '#lib/utils/switch-case';
 import { Logger } from '#lib/logger';
 import { isSubclass } from '#lib/utils/index';
 
-type ConstructableComponent = new (
-  arg0: Readonly<ComponentConstructorArguments>
-) => ComponentInterface;
+/**
+ * The base class of every concreet component.
+ */
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace Component {
+  /**
+   * The arguments to provide to the constructor of a component.
+   */
+  export type ConstructorArguments = ComponentConstructorArguments;
+
+  /**
+   * The arguments to provide to the render function.
+   */
+  export type RenderArguments = ComponentRenderArguments;
+
+  /**
+   * The interface which every instance of `Component` has to comply with.
+   */
+  export type Interface = ComponentInterface;
+}
 
 /**
  * The base class of every concreet component.
  */
-export abstract class Component implements ComponentInterface {
+export abstract class Component implements Component.Interface {
+  /** Utils related to components and their workings. */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  public static readonly utils = { ...componentUtils };
+
   /**
    * Keeps track of all components that have been added using `@Component.register`.
    */
@@ -109,27 +132,6 @@ export abstract class Component implements ComponentInterface {
     return false;
   }
 
-  public abstract hierarchy(): ReturnType<ComponentInterface['hierarchy']>;
+  public abstract hierarchy(): ReturnType<Component.Interface['hierarchy']>;
   public abstract render(arg0: Readonly<Component.RenderArguments>): string;
-}
-
-/**
- * The base class of every concreet component.
- */
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace Component {
-  /**
-   * The arguments to provide to the constructor of a component.
-   */
-  export type ConstructorArguments = ComponentConstructorArguments;
-
-  /**
-   * The arguments to provide to the render function.
-   */
-  export type RenderArguments = ComponentRenderArguments;
-
-  /**
-   * The base class of every concreet component.
-   */
-  export type Interface = ComponentInterface;
 }
