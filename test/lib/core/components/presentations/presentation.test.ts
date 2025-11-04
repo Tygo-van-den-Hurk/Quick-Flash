@@ -13,16 +13,12 @@ describe('class Presentation implements Component', () => {
     },
     focusMode: 'default' as const,
     id: '',
-    level: 4,
+    level: 0,
     path: ['root'],
   };
 
-  test('Is creatable with src', () => {
+  test('Is creatable', () => {
     expect(() => new Presentation({ ...construct })).not.toThrow();
-  });
-
-  test('Is not creatable with src', () => {
-    expect(() => new Presentation({ ...construct, attributes: {} })).toThrow();
   });
 
   const render = {

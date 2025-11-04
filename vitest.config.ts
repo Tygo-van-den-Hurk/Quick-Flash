@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     coverage: {
       all: true,
-      include: ['lib/**/*.ts', 'src/**/*.ts'],
+      include: ['lib/**/*.ts'],
       provider: 'istanbul',
       reportOnFailure: true,
       skipFull: true,

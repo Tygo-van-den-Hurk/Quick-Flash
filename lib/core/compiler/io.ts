@@ -9,11 +9,8 @@ import parseXML, {
   type XmlParserResult,
 } from 'xml-parser-xo';
 import { Component } from '#lib/core/components/index';
-import { LogLevel } from '#lib/types/log-level';
 import { Logger } from '#lib/logger';
 import { MarkupRenderer } from '#lib/core/markup/index';
-import chalk from 'chalk';
-import { oraPromise as ora } from 'ora';
 
 /**
  * Given an XML `XmlParserElementNode` filters out text elements that when trimmed are blank.
@@ -178,10 +175,5 @@ const loadPlugin = async function loadPlugin(filePath: string): Promise<void> {
  * Imports all imports from a list of imports.
  */
 export const loadPlugins = async function loadPlugins(plugins: readonly string[]): Promise<void> {
-  await ora(Promise.all(plugins.map(async (plugin) => loadPlugin(plugin))), {
-    failText: `${chalk.red('Failed')} to imported all ${plugins.length} plugins...`,
-    isSilent: LogLevel.of(Logger.logLevel).isMoreOrAsVerboseAs(LogLevel.INFO),
-    prefixText: chalk.cyan(LogLevel.INFO.toUpperCase()),
-    successText: `${chalk.green('Successfully')} imported all ${plugins.length} plugins.`,
-  });
+  await Promise.all(plugins.map(async (plugin) => loadPlugin(plugin)));
 };
