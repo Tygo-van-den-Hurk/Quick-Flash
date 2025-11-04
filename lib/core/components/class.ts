@@ -61,7 +61,7 @@ export abstract class Component implements Component.Interface {
     this.id = args.id;
     if (!this.canBeAtLevel(args.level)) {
       throw new Error(
-        `${Component.name} ${new.target.name} cannot be at level ${this.level}. ` +
+        `${Component.name} ${new.target.name} at ${this.path.join('.')} cannot be at level ${this.level}. ` +
           `Only at levels: ${this.hierarchy().toString()}`
       );
     }
