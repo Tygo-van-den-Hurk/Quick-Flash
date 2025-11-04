@@ -22,7 +22,7 @@ export class Slide extends Component {
       <div style="height:100%;width:100%">
         <h2>${this.title}</h2>
         <div style="width:100%">
-          ${children?.() ?? ""}
+          ${children?.() ?? ''}
         </div>
       </div>
     `;
@@ -30,7 +30,7 @@ export class Slide extends Component {
     // eslint-disable-next-line no-inline-comments
     return /*HTML*/ `
       <div style="height:100%;width:100%">
-        ${children?.() ?? ""}
+        ${children?.() ?? ''}
       </div>
     `;
   }
