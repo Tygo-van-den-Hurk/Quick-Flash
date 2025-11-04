@@ -5,7 +5,7 @@ const pluginFile = '#test-plugin.js';
 
 // Mock the absolute path that will actually be imported
 vi.mock('#test-plugin.js', () => ({
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-explicit-any
   default: ({ Component }: { Component: any }) =>
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     Component.register(
