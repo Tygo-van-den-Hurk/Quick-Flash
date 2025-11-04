@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { MarkupRenderer } from '#lib/core/markup/interfaces';
+import { MarkupRenderer } from '#lib/core/markup/class';
 
 describe('implements MarkupRender', () => {
   test(`garbage is not found`, () => {

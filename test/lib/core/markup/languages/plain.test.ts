@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { PlainMarkupRenderer } from '#lib/core/markup/plain';
+import { PlainMarkupRenderer } from '#lib/core/markup/languages/plain';
 
 describe('class PlainMarkupRenderer implements MarkupRender', () => {
   test(`rendering an empty string to see if it stays a literal`, () => {
