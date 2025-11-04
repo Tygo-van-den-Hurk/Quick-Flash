@@ -1,135 +1,276 @@
-/* eslint-disable */
+/* eslint-disable max-classes-per-file */
 
-import type { DeepReadonly } from '#lib/types/index';
+import { Marked, type Token } from 'marked';
 import { MarkupRenderer } from '#lib/core/markup/class';
 
-interface Marker {
-  marker: string;
-  htmlOpen: string;
-  htmlClose: string;
-  position: number;
+interface TokenizerReturn {
+  raw: string;
+  text: string;
+  type: string;
+  tokens?: Token[];
 }
 
+// ~ SLYDE MARKUP EXTENSION ~ bold
+
+/** The `marked` extension to render bold Slyde markup */
+export const slydeBoldExtension = {
+  level: 'inline' as const,
+  name: 'slyde-bold',
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  renderer: function renderer(token: Readonly<{ text: string; tokens?: Token[] }>): string {
+    // @ts-expect-error - this.parser exists on the renderer context
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-ternary, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const text = token.tokens ? this.parser.parseInline(token.tokens) : token.text;
+    return `<b>${text}</b>`;
+  },
+  start: (src: string): number => src.indexOf('**'),
+  tokenizer: function tokenizer(src: string): undefined | TokenizerReturn {
+    const rule = /^\*\*(?<text>(?:\\\*\*|[^*])+?)\*\*/u;
+    const match = rule.exec(src);
+    if (match?.groups) {
+      const text = match.groups.text.replace(/\\\*\*/gu, '**');
+      const token: TokenizerReturn = {
+        raw: match[0],
+        text,
+        type: 'slyde-bold',
+      };
+      // @ts-expect-error - this.lexer exists on the tokenizer context
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      token.tokens = this.lexer.inlineTokens(text);
+      return token;
+    }
+
+    // eslint-disable-next-line no-undefined
+    return undefined;
+  },
+};
+
+// ~ SLYDE MARKUP EXTENSION ~ italic
+
+/** The `marked` extension to render italic Slyde markup. */
+export const slydeItalicExtension = {
+  level: 'inline' as const,
+  name: 'slyde-italic',
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  renderer: function renderer(token: Readonly<{ text: string; tokens?: Token[] }>): string {
+    // @ts-expect-error - this.parser exists on the renderer context
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-ternary, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const text = token.tokens ? this.parser.parseInline(token.tokens) : token.text;
+    return `<i>${text}</i>`;
+  },
+  start: (src: string): number => src.indexOf('//'),
+  tokenizer: function tokenizer(src: string): undefined | TokenizerReturn {
+    const rule = /^\/\/(?<text>(?:\\\/\/|[^/])+?)\/\//u;
+    const match = rule.exec(src);
+    if (match?.groups) {
+      const text = match.groups.text.replace(/\\\/\//gu, '//');
+      const token: TokenizerReturn = {
+        raw: match[0],
+        text,
+        type: 'slyde-italic',
+      };
+
+      // @ts-expect-error - this.lexer exists on the tokenizer context
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      token.tokens = this.lexer.inlineTokens(text);
+      return token;
+    }
+
+    // eslint-disable-next-line no-undefined
+    return undefined;
+  },
+};
+
+// ~ SLYDE MARKUP EXTENSION ~ superscript
+
+/** The `marked` extension to render superscript Slyde markup. */
+export const slydeSuperscriptExtension = {
+  level: 'inline' as const,
+  name: 'slyde-superscript',
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  renderer: function renderer(token: Readonly<{ text: string; tokens?: Token[] }>): string {
+    // @ts-expect-error - this.parser exists on the renderer context
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-ternary, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const text = token.tokens ? this.parser.parseInline(token.tokens) : token.text;
+    return `<sup>${text}</sup>`;
+  },
+  start: (src: string): number => src.indexOf('^^'),
+  tokenizer: function tokenizer(src: string): undefined | TokenizerReturn {
+    const rule = /^\^\^(?<text>(?:\\\^\^|[^^])+?)\^\^/u;
+    const match = rule.exec(src);
+    if (match?.groups) {
+      const text = match.groups.text.replace(/\\\^\^/gu, '^^');
+      const token: TokenizerReturn = {
+        raw: match[0],
+        text,
+        type: 'slyde-superscript',
+      };
+      
+      // @ts-expect-error - this.lexer exists on the tokenizer context
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      token.tokens = this.lexer.inlineTokens(text);
+      return token;
+    }
+
+    // eslint-disable-next-line no-undefined
+    return undefined;
+  },
+};
+
+// ~ SLYDE MARKUP EXTENSION ~ underlined
+
+/** The `marked` extension to render underlined Slyde markup */
+export const slydeUnderlineExtension = {
+  level: 'inline' as const,
+  name: 'slyde-underline',
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  renderer: function renderer(token: Readonly<{ text: string; tokens?: Token[] }>): string {
+    // @ts-expect-error - this.parser exists on the renderer context
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-ternary, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const text = token.tokens ? this.parser.parseInline(token.tokens) : token.text;
+    return `<u>${text}</u>`;
+  },
+  start: (src: string): number => src.indexOf('__'),
+  tokenizer: function tokenizer(src: string): undefined | TokenizerReturn {
+    const rule = /^__(?<text>(?:\\__|[^_])+?)__/u;
+    const match = rule.exec(src);
+    if (match?.groups) {
+      const text = match.groups.text.replace(/\\__/gu, '__');
+      const token: TokenizerReturn = {
+        raw: match[0],
+        text,
+        type: 'slyde-underline',
+      };
+
+      // @ts-expect-error - this.lexer exists on the tokenizer context
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      token.tokens = this.lexer.inlineTokens(text);
+      return token;
+    }
+
+    // eslint-disable-next-line no-undefined
+    return undefined;
+  },
+};
+
+// ~ SLYDE MARKUP EXTENSION ~ code
+
+/** The `marked` extension to render code/monospaced Slyde markup. */
+const slydeCodeExtension = {
+  level: 'inline' as const,
+  name: 'slyde-code',
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  renderer: function renderer(token: Readonly<{ text: string; tokens?: Token[] }>): string {
+    return `<code>${token.text}</code>`;
+  },
+  start: (src: string): number => src.indexOf('``'),
+  tokenizer: function tokenizer(src: string): undefined | TokenizerReturn {
+    const rule = /^``(?<text>(?:\\``|[^`])+?)``/u;
+    const match = rule.exec(src);
+    if (match?.groups) {
+      const text = match.groups.text.replace(/\\``/gu, '``');
+      const token: TokenizerReturn = {
+        raw: match[0],
+        text,
+        type: 'slyde-code',
+      };
+
+      // @ts-expect-error - this.lexer exists on the tokenizer context
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      token.tokens = this.lexer.inlineTokens(text);
+      return token;
+    }
+
+    // eslint-disable-next-line no-undefined
+    return undefined;
+  },
+};
+
+// ~ SLYDE MARKUP EXTENSION ~ strikethrough
+
+const strikeExtension = {
+  level: 'inline' as const,
+  name: 'slyde-strike',
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  renderer: function renderer(token: Readonly<{ text: string; tokens?: Token[] }>): string {
+    // @ts-expect-error - this.parser exists on the renderer context
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-ternary, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const text = token.tokens ? this.parser.parseInline(token.tokens) : token.text;
+    return `<s>${text}</s>`;
+  },
+  start: (src: string): number => src.indexOf('~~'),
+  tokenizer: function tokenizer(src: string): undefined | TokenizerReturn {
+    const rule = /^~~(?<text>(?:\\~~|[^~])+?)~~/u;
+    const match = rule.exec(src);
+    if (match?.groups) {
+      const text = match.groups.text.replace(/\\~~/gu, '~~');
+      const token: TokenizerReturn = {
+        raw: match[0],
+        text,
+        type: 'slyde-strike',
+      };
+      
+      // @ts-expect-error - this.lexer exists on the tokenizer context
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      token.tokens = this.lexer.inlineTokens(text);
+      return token;
+    }
+
+    // eslint-disable-next-line no-undefined
+    return undefined;
+  },
+};
+
+// ~ MARKED EXTENSIONS ~ //
+
+/** All slyde extension for `marked`, a markdown parsing library. */
+export const slydeMarkedExtensions = [
+  slydeBoldExtension,
+  slydeUnderlineExtension,
+  slydeSuperscriptExtension,
+  slydeCodeExtension,
+  strikeExtension,
+  slydeItalicExtension,
+];
+
+// ~ MARKED PARSER ~ //
+
+const getRaw: ({ raw }: Readonly<{ raw: string }>) => string = ({ raw }) => raw;
+const getText: ({ text }: Readonly<{ text: string }>) => string = ({ text }) => text;
+
+const parser = new Marked({
+  breaks: false,
+  gfm: false,
+  renderer: {
+    blockquote: getRaw,
+    em: getRaw,
+    heading: getRaw,
+    hr: getRaw,
+    html: getRaw,
+    image: getRaw,
+    list: getRaw,
+    listitem: getRaw,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    paragraph({ tokens }): string {
+      return this.parser.parseInline(tokens);
+    },
+    strong: getRaw,
+    table: getRaw,
+    tablecell: getText,
+    tablerow: getText,
+  },
+});
+
+parser.use({ extensions: [...slydeMarkedExtensions] });
+
 /**
- * A `MarkupRenderer` for Slyde's custom markup language.
+ * A `MarkupRenderer` for Slyde' unique markup language.
  */
 @MarkupRenderer.register
 export class SlydeMarkupRenderer extends MarkupRenderer {
-  public readonly MARKERS: Record<string, { htmlOpen: string; htmlClose: string }> = {
-    '**': { htmlClose: '</b>', htmlOpen: '<b>' },
-    '//': { htmlClose: '</i>', htmlOpen: '<i>' },
-    '^^': { htmlClose: '</sup>', htmlOpen: '<sup>' },
-    __: { htmlClose: '</u>', htmlOpen: '<u>' },
-    '``': { htmlClose: '</code>', htmlOpen: '<code>' },
-    '~~': { htmlClose: '</s>', htmlOpen: '<s>' },
-  };
-
-  public readonly IGNORE_MARKERS_INSIDE = ['``'];
-  public readonly NON_NESTABLE_MARKERS = Object.keys(this.MARKERS);
-
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public render(input: string): string {
-    const stack: Marker[] = [];
-    let output = '';
-    let index = 0;
-
-    while (index < input.length) {
-      // Handle escaped characters
-      if (input[index] === '\\' && index + 1 < input.length) {
-        output += input[index];
-        index += 1;
-        output += input[index + 1];
-        index += 1;
-        continue;
-      }
-
-      // Detect marker
-      const foundMarker = Object.keys(this.MARKERS).find(
-        (marker) => input.slice(index, index + marker.length) === marker
-      );
-
-      if (foundMarker) {
-        // Try to close an open marker
-        const openIndex = stack.map((m) => m.marker).lastIndexOf(foundMarker);
-        if (openIndex !== -1) {
-          // Check if this is the top of the stack (properly nested)
-          if (openIndex === stack.length - 1) {
-            // Properly nested - close it
-            const closed = stack.pop()!;
-            output += closed.htmlClose;
-            index += foundMarker.length;
-            continue;
-          } else {
-            // Improperly nested - close the marker and revert everything after it
-            const markersToRevert: Marker[] = [];
-            while (stack.length > openIndex + 1) {
-              markersToRevert.unshift(stack.pop()!);
-            }
-            const closed = stack.pop()!;
-
-            // Revert the markers that were opened after the one we're closing
-            for (const m of markersToRevert) {
-              output = output.replace(m.htmlOpen, m.marker);
-            }
-
-            output += closed.htmlClose;
-            index += foundMarker.length;
-            continue;
-          }
-        }
-
-        // Try to open marker
-        if (this.canOpenMarker(foundMarker, stack)) {
-          stack.push({
-            marker: foundMarker,
-            ...this.MARKERS[foundMarker],
-            position: index,
-          });
-          output += this.MARKERS[foundMarker].htmlOpen;
-        } else {
-          // Not allowed --> treat as literal
-          output += foundMarker;
-        }
-
-        index += foundMarker.length;
-        continue;
-      }
-
-      // Regular character
-      output += input[index];
-      index++;
-    }
-
-    // Unclosed markers → revert
-    while (stack.length) {
-      const unclosed = stack.pop();
-      if (!unclosed) throw new Error();
-      output = output.replace(unclosed.htmlOpen, unclosed.marker);
-    }
-
-    return output;
-  }
-
-  private canOpenMarker(marker: string, stack: DeepReadonly<Marker[]>): boolean {
-    if (!stack.length) return true;
-    const topMarker = stack[stack.length - 1];
-
-    if (!topMarker) return true;
-    const top = topMarker.marker;
-
-    // Markers inside code or other ignored markers
-    if (this.IGNORE_MARKERS_INSIDE.includes(top) && !this.IGNORE_MARKERS_INSIDE.includes(marker)) {
-      return false;
-    }
-
-    // Non-nestable markers cannot open inside themselves
-    if (
-      this.NON_NESTABLE_MARKERS.includes(marker) &&
-      stack.some((mark) => mark.marker === marker)
-    ) {
-      return false;
-    }
-
-    return true;
+    return parser.parse(input, { async: false });
   }
 }
 
