@@ -18,6 +18,7 @@ Here is an example:
   //This text will be italic//
   ^^This text will be in superscript^^
   ``This text will be monospaced``
+  or add a [link to somewhere](http://exmple.com)
 </text>
 ```
 
@@ -48,6 +49,7 @@ To select the a different markup renderer for example Markdown, change the marku
   ~~This text will be struck through~~  
   *This text will be italic*  
   `This text will be monospaced`
+  or add a [link to somewhere](http://exmple.com)
 </text>
 ```
 
@@ -60,11 +62,6 @@ You might not want the markup to be processed at all. In that case you have 3 op
 ```XML
 <text markup="plain">
   **This text will NOT be bold**
-  __This text will NOT be underlined__
-  ~~This text will NOT be struck through~~
-  //This text will NOT be italic//
-  ^^This text will NOT be in superscript^^
-  ``This text will NOT be monospaced``
 </text>
 ```
 
@@ -74,11 +71,9 @@ or use a [processing instruction](./processing-instructions.md):
 <?slyde markup="plain"?>
 <text>
   **This text will NOT be bold**
-  __This text will NOT be underlined__
-  ~~This text will NOT be struck through~~
-  //This text will NOT be italic//
-  ^^This text will NOT be in superscript^^
-  ``This text will NOT be monospaced``
+</text>
+<text>
+  **and neither will this one be**
 </text>
 ```
 
@@ -87,11 +82,6 @@ Or you can use an XML CDATA tag:
 ```XML
 <text><CDATA[[
   **This text will NOT be bold**
-  __This text will NOT be underlined__
-  ~~This text will NOT be struck through~~
-  //This text will NOT be italic//
-  ^^This text will NOT be in superscript^^
-  ``This text will NOT be monospaced``
 ]]></text>
 ```
 
