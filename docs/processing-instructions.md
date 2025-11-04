@@ -7,20 +7,12 @@ Processing instructions are a special way to tell the compiler things. They do n
 An example is the processing instructions to change the [markup renderer](markup.md) to something else from here on out for all next elements and their descendants.
 
 ```XML
-<text >
-  **This text will be bold**  
-  ~~This text will be struck through~~  
-  *This text will be italic*  
-  `This text will be monospaced`
+<text>
+  **This text will be bold**
 </text>
 <?slyde markup="plain"?>
 <text>
   **This text will NOT be bold**
-  __This text will NOT be underlined__
-  ~~This text will NOT be struck through~~
-  //This text will NOT be italic//
-  ^^This text will NOT be in superscript^^
-  ``This text will NOT be monospaced``
 </text>
 ```
 
