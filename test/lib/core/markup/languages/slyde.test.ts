@@ -13,6 +13,24 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     '~': { close: '</s>', open: '<s>' },
   };
 
+  test('rendering link', () => {
+    const input = `[this](http://example.com)`;
+    const result = new SlydeMarkupRenderer().render(input);
+    expect(result).toBe(`<a href="http://example.com">this</a>`);
+  });
+
+  test('images are not rendered out', () => {
+    const input = `![this](http://example.com)`;
+    const result = new SlydeMarkupRenderer().render(input);
+    expect(result).toBe(input);
+  });
+
+  test('filter out table', () => {
+    const input = `| Header |\n|--------|\n| entry  |`;
+    const result = new SlydeMarkupRenderer().render(input);
+    expect(result).toBe(input);
+  });
+  
   test('rendering italic and urls', () => {
     const input = `this is an HTTP URL: http://example.com/ this is an HTTPS URL: https://example.com/`;
     const result = new SlydeMarkupRenderer().render(input);
@@ -20,6 +38,9 @@ describe('class SlydeMarkup implements MarkupRender', () => {
   });
 
   for (const marker of markers) {
+    /// Limit test cases when debugging to not get overwhelmed:
+    /// if (marker !== markers[0]) continue;
+
     const nextMarker = markers[(markers.indexOf(marker) + 1) % markers.length];
     const prevMarker = markers[(markers.indexOf(marker) + markers.length - 3) % markers.length];
 
@@ -54,18 +75,14 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     });
 
     test(`rendering an escaped marker reverts to a literal"`, () => {
-      const input1 = `something not \\${marker}${marker}word${marker}${marker}`;
+      const input1 = `Lorem \\${marker}${marker}ipsum dolor${marker}${marker} sit`;
+      const expected1 = `Lorem ${marker}${marker}ipsum dolor${marker}${marker} sit`;
       const result1 = new SlydeMarkupRenderer().render(input1);
-      expect(result1).toBe(input1);
-      const input2 = `something not ${marker}\\${marker}word${marker}${marker}`;
+      expect(result1).toBe(expected1);
+      const input2 = `Lorem ${marker}${marker}ipsum\\${marker}${marker} dolor${marker}${marker} sit`;
+      const expected2 = `Lorem ${tags[marker].open}ipsum${marker}${marker} dolor${tags[marker].close} sit`;
       const result2 = new SlydeMarkupRenderer().render(input2);
-      expect(result2).toBe(input2);
-      const input3 = `something not ${marker}${marker}word\\${marker}${marker}`;
-      const result3 = new SlydeMarkupRenderer().render(input3);
-      expect(result3).toBe(input3);
-      const input4 = `something not ${marker}${marker}word${marker}\\${marker}`;
-      const result4 = new SlydeMarkupRenderer().render(input4);
-      expect(result4).toBe(input4);
+      expect(result2).toBe(expected2);
     });
 
     test('rendering unclosed marker reverts to literal', () => {
@@ -82,10 +99,9 @@ describe('class SlydeMarkup implements MarkupRender', () => {
 
     test('rendering same marker cannot nest within itself', () => {
       const input = `${marker}${marker}outer ${marker}${marker}inner${marker}${marker} outer${marker}${marker}`;
+      const expected = `${tags[marker].open}outer ${tags[marker].close}inner${tags[marker].open} outer${tags[marker].close}`
       const result = new SlydeMarkupRenderer().render(input);
-      expect(result).toBe(
-        `${tags[marker].open}outer ${marker}${marker}inner${tags[marker].close} outer${marker}${marker}`
-      );
+      expect(result).toBe(expected);
     });
 
     test('rendering same marker on different lines', () => {
@@ -93,7 +109,7 @@ describe('class SlydeMarkup implements MarkupRender', () => {
       line 2${marker}${marker}`;
       const result = new SlydeMarkupRenderer().render(input);
       expect(result).toBe(`${tags[marker].open}line 1
-      line 2${marker}${marker}`);
+      line 2${tags[marker].close}`);
     });
 
     test('rendering adjacent markers', () => {
@@ -107,7 +123,7 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     test('rendering escaped backslash before marker', () => {
       const input = `\\\\${marker}${marker}word${marker}${marker}`;
       const result = new SlydeMarkupRenderer().render(input);
-      expect(result).toBe(`\\\\${tags[marker].open}word${tags[marker].close}`);
+      expect(result).toBe(`\\${tags[marker].open}word${tags[marker].close}`);
     });
 
     test('rendering marker at end of string (unclosed)', () => {
@@ -116,28 +132,26 @@ describe('class SlydeMarkup implements MarkupRender', () => {
       expect(result).toBe(input);
     });
 
-    test('rendering mixed escaped and unescaped markers', () => {
-      const input = `\\${marker}${marker}not styled${marker}${marker} ${marker}${marker}styled${marker}${marker}`;
-      const result = new SlydeMarkupRenderer().render(input);
-      expect(result).toBe(
-        `\\${marker}${marker}not styled${marker}${marker} ${tags[marker].open}styled${tags[marker].close}`
-      );
-    });
-
     test('rendering marker followed immediately by escaped marker', () => {
       const input = `${marker}${marker}\\${marker}${marker}text${marker}${marker}`;
       const result = new SlydeMarkupRenderer().render(input);
-      expect(result).toBe(`${tags[marker].open}\\${marker}${marker}text${tags[marker].close}`);
+      expect(result).toBe(`${tags[marker].open}${marker}${marker}text${tags[marker].close}`);
     });
 
+    test("rendering marker who's first closing marker is an escaped marker", () => {
+      const input = `${marker}${marker}text\\${marker}${marker}${marker}${marker}`;
+      const result = new SlydeMarkupRenderer().render(input);
+      expect(result).toBe(`${tags[marker].open}text${marker}${marker}${tags[marker].close}`);
+    });
+
+
     // These markers have special properties.
-    if (['``'].includes(`${nextMarker}${nextMarker}`)) {
+    if (['``'].includes(`${marker}${marker}`)) {
       test('rendering markers in "code blocks" are literal', () => {
-        const input = `${marker}${marker}code ${nextMarker}${nextMarker}bold${nextMarker}${nextMarker} ${prevMarker}${prevMarker}italic${prevMarker}${prevMarker}${marker}${marker}`;
+        const input = `${marker}${marker}lorem ${nextMarker}${nextMarker}ipsum${nextMarker}${nextMarker} ${prevMarker}${prevMarker}dolor${prevMarker}${prevMarker}${marker}${marker}`;
+        const expected = `${tags[marker].open}lorem ${nextMarker}${nextMarker}ipsum${nextMarker}${nextMarker} ${prevMarker}${prevMarker}dolor${prevMarker}${prevMarker}${tags[marker].close}`;
         const result = new SlydeMarkupRenderer().render(input);
-        expect(result).toBe(
-          `${tags[marker].open}code ${nextMarker}${nextMarker}bold${nextMarker}${nextMarker} ${prevMarker}${prevMarker}italic${prevMarker}${prevMarker}${tags[marker].close}`
-        );
+        expect(result).toBe(expected);
       });
 
       continue;
