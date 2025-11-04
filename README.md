@@ -26,3 +26,11 @@ Slyde is a program to create professional beautifully animated presentations fro
 This would output the following fully animated presentation:
 
 <img src="./docs/assets/example-presentation.gif" width="100%" alt="An example Slyde presentation based on the previous example XML template">
+
+## Features
+
+- Easily build beautifully animated presentations
+- Use markup to effortlessly style your text
+- Rich plugin system extend Slyde in under a minute
+- Exports are offline-ready HTML files
+- Embed images in your presentation
