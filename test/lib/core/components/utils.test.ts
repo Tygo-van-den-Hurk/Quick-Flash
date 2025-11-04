@@ -58,18 +58,16 @@ describe('function toDataURL', () => {
   });
 });
 
-
 describe('function toMime', () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
 
   test('normal type', () => {
-    expect(() => toMime("png")).not.toThrow();
+    expect(() => toMime('png')).not.toThrow();
   });
 
   test('garbage input throws', () => {
-    expect(() => toMime("GAR8AG3")).toThrow();
+    expect(() => toMime('GAR8AG3')).toThrow();
   });
 });
-
