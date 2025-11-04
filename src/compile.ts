@@ -4,7 +4,6 @@ import { promises as FileSystem, type PathLike } from 'fs';
 import chalk from 'chalk';
 import ora from 'ora';
 import path from 'path';
-import prettier from 'prettier';
 
 /**
  * The possible options you can provide to the `compile` function.
@@ -81,17 +80,8 @@ export const compileFromCliArgs = async function compileFromCliArgs(
   args: DeepReadonly<CompileArgs> = CompileArgs.defaults
 ): Promise<void> {
   const options = CompileArgs.fillUpWithDefaults(args);
-  const content = compiler.io.readInput(options.file);
-  Logger.debug(`Read file ${options.file}`);
-  const parsed = compiler.io.parseInput(content);
-  Logger.debug(`Parsed file ${options.file}`);
-  await compiler.io.loadPlugins(options.plugins);
-  Logger.debug(`Loaded ${options.plugins.length} plugins:`, options.plugins);
-  const rendered = compiler.render.render(parsed);
-  Logger.debug(`Rendered file ${options.file}`);
-  const formatted = await prettier.format(rendered, { parser: 'html' });
-  Logger.debug(`Formatted result`);
-  const writeResult = await writeToDisk(options.output, formatted);
+  const result = await compiler.compile(options);
+  const writeResult = await writeToDisk(options.output, result);
   if (writeResult.type === 'error') throw writeResult.error;
-  Logger.debug(`Write result to: ${options.output}`);
+  Logger.info(`Write result to: ${options.output}`);
 };
