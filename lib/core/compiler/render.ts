@@ -7,7 +7,7 @@ import type {
 } from 'xml-parser-xo';
 import { Component } from '#lib/core/components/class';
 import { Logger } from '#lib/logger';
-import { MarkupRenderer } from '#lib/core/markup/interfaces';
+import { MarkupRenderer } from '#lib/core/markup/class';
 import pkg from '#package' with { type: 'json' };
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Types ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
@@ -58,7 +58,7 @@ export const getMarkupRenderer = function getMarkupRenderer(name: string): Marku
   const MarkupRendererInstance = MarkupRenderer.retrieve(name);
   if (MarkupRendererInstance) return new MarkupRendererInstance();
   throw new Error(
-    `A markup language "${name}" was requested, but no such renderer was installed.` +
+    `A markup language "${name}" was requested, but no such renderer was installed. ` +
       '(Did you load the plugin?)'
   );
 };
@@ -71,8 +71,12 @@ export const createComponentInstance = function createComponentInstance(
   state: State
 ): Component {
   const ComponentInstance = Component.retrieve(element.name);
-  if (!ComponentInstance)
-    throw new Error(`No such ${Component.name}: ${element.name} at ${state.path.join('.')}`);
+  if (!ComponentInstance) {
+    throw new Error(
+      `No such ${Component.name}: ${element.name} at ${state.path.join('.')}. ` +
+        `(Did you load the plugin?)`
+    );
+  }
 
   const instance = new ComponentInstance({
     attributes: { ...element.attributes },

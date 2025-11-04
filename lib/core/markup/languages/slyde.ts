@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 import type { DeepReadonly } from '#lib/types/index';
-import { MarkupRenderer } from '#lib/core/markup/interfaces';
+import { MarkupRenderer } from '#lib/core/markup/class';
 
 interface Marker {
   marker: string;
@@ -14,7 +14,7 @@ interface Marker {
  * A `MarkupRenderer` for Slyde's custom markup language.
  */
 @MarkupRenderer.register
-export class SlydeMarkupRenderer implements MarkupRenderer {
+export class SlydeMarkupRenderer extends MarkupRenderer {
   public readonly MARKERS: Record<string, { htmlOpen: string; htmlClose: string }> = {
     '**': { htmlClose: '</b>', htmlOpen: '<b>' },
     '//': { htmlClose: '</i>', htmlOpen: '<i>' },

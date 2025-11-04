@@ -1,4 +1,5 @@
-export * from '#lib/core/markup/slyde';
-export * from '#lib/core/markup/markdown';
-export * from '#lib/core/markup/plain';
-export * from '#lib/core/markup/interfaces';
+export * from '#lib/core/markup/languages/slyde';
+export * from '#lib/core/markup/languages/markdown';
+export * from '#lib/core/markup/languages/plain';
+export * from '#lib/core/markup/class';
+export type * from '#lib/core/markup/interfaces';

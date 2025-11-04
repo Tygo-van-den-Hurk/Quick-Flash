@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { SlydeMarkupRenderer } from '#lib/core/markup/slyde';
+import { SlydeMarkupRenderer } from '#lib/core/markup/languages/slyde';
 
 describe('class SlydeMarkup implements MarkupRender', () => {
   const markers = ['*', '/', '^', '_', '`', '~'] as const;

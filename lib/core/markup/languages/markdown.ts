@@ -1,5 +1,5 @@
 import { Marked } from 'marked';
-import { MarkupRenderer } from '#lib/core/markup/interfaces';
+import { MarkupRenderer } from '#lib/core/markup/class';
 
 const getRaw: ({ raw }: Readonly<{ raw: string }>) => string = ({ raw }) => raw;
 const getText: ({ text }: Readonly<{ text: string }>) => string = ({ text }) => text;
@@ -29,7 +29,7 @@ const parser = new Marked({
  * A `MarkupRenderer` for Markdown.
  */
 @MarkupRenderer.register
-export class MarkdownRenderer implements MarkupRenderer {
+export class MarkdownRenderer extends MarkupRenderer {
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public render(input: string): string {
     return parser.parse(input, { async: false });
