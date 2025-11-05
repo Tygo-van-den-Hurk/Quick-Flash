@@ -19,6 +19,7 @@ Here is an example:
   ^^This text will be in superscript^^
   ``This text will be monospaced``
   or add a [link to somewhere](http://exmple.com)
+  or add latex: $${x\over2}$$ for math
 </text>
 ```
 
@@ -40,16 +41,13 @@ There is support out of the box for replacing the default markup renderer implem
 - `Slyde` (default)
 - `Markdown`
 - `Plain` (Aliased under `Raw` and `Off`)
+- `Latex` (math mode only)
 
 To select the a different markup renderer for example Markdown, change the markup key:
 
 ```XML
 <text markup="markdown">
   **This text will be bold**  
-  ~~This text will be struck through~~  
-  *This text will be italic*  
-  `This text will be monospaced`
-  or add a [link to somewhere](http://exmple.com)
 </text>
 ```
 
