@@ -1,12 +1,10 @@
 # Markup
 
-To make it easy to style text Slyde uses it's own [markup language](https://en.wikipedia.org/wiki/Markup_language) (or any you want). Slyde' markup renderer behaves as much as markdown as possible. If you found an example where the 2 behave differently, [please open an issue](https://github.com/Tygo-van-den-Hurk/Slyde/issues/new). There were only a couple changes from markdown.
+Since we use [XML](https://en.wikipedia.org/wiki/XML) to configure our presentation, we can't use [HTML](https://en.wikipedia.org/wiki/HTML)/[XML](https://en.wikipedia.org/wiki/XML) elements to render anything as that will confuse the parser with what is text and what is an element to render. That is why [markup languages](https://en.wikipedia.org/wiki/Markup_language) are used. 
 
-1. The markers used. Bold and strick through remain the same, but italic. and monospace are different markers.
-2. The markers are always 2 symbols right after each other to make it obvious what a marker is.
-3. There is an addition to write superscript without having to resort to latex or Unicode.
+## Slyde Markup
 
-## Examples
+Since [markdown](https://en.wikipedia.org/wiki/Markdown) did not have support for everything I thought was useful without resorting to [HTML](https://en.wikipedia.org/wiki/HTML) I created the "Slyde markup" language. Functionality wise a superset of [markdown](https://en.wikipedia.org/wiki/Markdown).
 
 Here is an example:
 
@@ -14,34 +12,40 @@ Here is an example:
 <text markup="slyde">
   **This text will be bold**
   __This text will be underlined__
-  ~~This text will be struck through~~
   //This text will be italic//
+  ~~This text will be struck through~~
   ^^This text will be in superscript^^
   ``This text will be monospaced``
-  or add a [link to somewhere](http://exmple.com)
-  or add latex: $${x\over2}$$ for math
+  add a [link to somewhere](http://exmple.com)
+  or add latex for math: $$ y = { x \over 2 } $$
 </text>
 ```
 
-This markup is rendered automatically in the text of most components unless they opt out of having it's direct text children rendered. The markup attribute is optional, and can will default to `markup="slyde"`. Meaning these two are identical:
+Markers can be escaped using `\` as usual in any language.
 
 ```XML
 <text markup="slyde">
-  **This text will be bold**
-</text>
-<text>
-  **This text will ALSO be bold**
+  \**This text will be bold**
 </text>
 ```
 
-## Renderers
+Watch out as what was a closing marker is now an open marker.
 
-There is support out of the box for replacing the default markup renderer implementation with any of your choice using plugins. The following Markup renders are installed by default:
+## Design Philosophy
 
-- `Slyde` (default)
-- `Markdown`
-- `Plain` (Aliased under `Raw` and `Off`)
-- `Latex` (math mode only)
+Slyde' markup was designed to be as simple as possible, and to be as consistent as possible. Therefor there were a couple changes from it's base:
+
+1. All markers are exactly 2 symbols after each other to make it obvious what a marker is. The one exception being a link as it takes an "argument" and I liked markdowns implementation.
+2. The markers were chosen based on how obvious it's use case would be, and to be as similar to markdown as possible at the same time. For example italic is `//italic//`, underline is `__underline__`, superscript is `^^superscript^^`, and so forth...
+
+## Markup Renderers
+
+There is support out of the box for replacing the default markup renderer implementation with any of your choice using plugins. The following Markup renders are installed by default, and can be used without any plugins:
+
+- [`Slyde`](#slyde-markup) (default)
+- [`Markdown`](https://en.wikipedia.org/wiki/Markdown)
+- [`Latex`](https://en.wikipedia.org/wiki/LaTeX) (math mode only)
+- [`Plain`](#switching-it-off) (Aliased under `Raw` and `Off`)
 
 To select the a different markup renderer for example Markdown, change the markup key:
 
@@ -52,6 +56,17 @@ To select the a different markup renderer for example Markdown, change the marku
 ```
 
 The text will now be treated as markdown instead of Slyde' markup. But since Slyde' markup supports more styles and is easier for most non-technical people to understand it is the default.
+
+This markup is rendered automatically in the text of all components. The markup attribute is optional, and can will default to `markup="slyde"`. Meaning these two are identical:
+
+```XML
+<text markup="slyde">
+  **This text will be bold**
+</text>
+<text>
+  **This text will ALSO be bold**
+</text>
+```
 
 ## Switching it off
 
@@ -85,6 +100,3 @@ Or you can use an XML CDATA tag:
 
 A CDATA tag Does not modify the text in any way what so ever. It preserves even whitespace if that is important to you.
 
-## Quirks
-
-Since we use XML to configure our markup language cannot use HTML/XML elements to render anything as that will confuse the parser with what is text and what is an element to render. That is why markup languages are used.
