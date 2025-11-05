@@ -97,7 +97,8 @@ export class Presentation extends Component {
     this.icon = args.attributes.icon ?? DEFAULT_ICON_URL;
     this.keywords = args.attributes.keywords ?? DEFAULT_KEYWORDS;
     this.description = args.attributes.description ?? args.attributes.alt ?? DEFAULT_DESCRIPTION;
-    this.authors = args.attributes.authors ?? args.attributes.author ?? args.attributes.by ?? DEFAULT_AUTHOR;
+    this.authors =
+      args.attributes.authors ?? args.attributes.author ?? args.attributes.by ?? DEFAULT_AUTHOR;
     this.background =
       args.attributes.background ?? args.attributes['background-color'] ?? DEFAULT_BACKGROUND;
     this.foreground =
