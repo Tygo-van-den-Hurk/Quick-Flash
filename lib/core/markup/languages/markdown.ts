@@ -1,5 +1,6 @@
 import { Marked } from 'marked';
 import { MarkupRenderer } from '#lib/core/markup/class';
+import { latex1Extension } from '#lib/core/markup/languages/latex';
 
 const getRaw: ({ raw }: Readonly<{ raw: string }>) => string = ({ raw }) => raw;
 const getText: ({ text }: Readonly<{ text: string }>) => string = ({ text }) => text;
@@ -24,6 +25,8 @@ const parser = new Marked({
     tablerow: getText,
   },
 });
+
+parser.use({ extensions: [latex1Extension] });
 
 /**
  * A `MarkupRenderer` for Markdown.

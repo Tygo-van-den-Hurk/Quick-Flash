@@ -2,6 +2,7 @@
 
 import { Marked, type Token } from 'marked';
 import { MarkupRenderer } from '#lib/core/markup/class';
+import { latex2Extension } from '#lib/core/markup/languages/latex';
 
 interface TokenizerReturn {
   raw: string;
@@ -105,7 +106,7 @@ export const slydeSuperscriptExtension = {
         text,
         type: 'slyde-superscript',
       };
-      
+
       // @ts-expect-error - this.lexer exists on the tokenizer context
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       token.tokens = this.lexer.inlineTokens(text);
@@ -209,7 +210,7 @@ const strikeExtension = {
         text,
         type: 'slyde-strike',
       };
-      
+
       // @ts-expect-error - this.lexer exists on the tokenizer context
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       token.tokens = this.lexer.inlineTokens(text);
@@ -221,6 +222,10 @@ const strikeExtension = {
   },
 };
 
+// ~ SLYDE MARKUP EXTENSION ~ strikethrough
+
+const slydeLatexExtension = latex2Extension;
+
 // ~ MARKED EXTENSIONS ~ //
 
 /** All slyde extension for `marked`, a markdown parsing library. */
@@ -231,6 +236,7 @@ export const slydeMarkedExtensions = [
   slydeCodeExtension,
   strikeExtension,
   slydeItalicExtension,
+  slydeLatexExtension,
 ];
 
 // ~ MARKED PARSER ~ //
@@ -279,3 +285,4 @@ export class SlydeMarkupRenderer extends MarkupRenderer {
  */
 @MarkupRenderer.register
 export class DefaultMarkupRenderer extends SlydeMarkupRenderer {}
+
