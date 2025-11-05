@@ -24,17 +24,17 @@ describe('class TitleSlide implements Component', () => {
   };
 
   test('renders author if present', () => {
-    const author = "Tygo van den Hurk";
-    const attributes = { author};
-    const slide = new TitleSlide({ ...construct, attributes }) ;
+    const author = 'Tygo van den Hurk';
+    const attributes = { author };
+    const slide = new TitleSlide({ ...construct, attributes });
     expect(slide.render({})).toContain(author);
   });
 
   test('renders all authors if present', () => {
-    const author1 = "Tygo van den Hurk";
-    const author2 = "John Doe";
+    const author1 = 'Tygo van den Hurk';
+    const author2 = 'John Doe';
     const authors = `${author1}, ${author2}`;
-    const attributes = { authors};
+    const attributes = { authors };
     const slide = new TitleSlide({ ...construct, attributes });
     const result = slide.render({});
     expect(result).toContain(author1);

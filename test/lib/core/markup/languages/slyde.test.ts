@@ -30,7 +30,7 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     const result = new SlydeMarkupRenderer().render(input);
     expect(result).toBe(input);
   });
-  
+
   test('rendering italic and urls', () => {
     const input = `this is an HTTP URL: http://example.com/ this is an HTTPS URL: https://example.com/`;
     const result = new SlydeMarkupRenderer().render(input);
@@ -99,7 +99,7 @@ describe('class SlydeMarkup implements MarkupRender', () => {
 
     test('rendering same marker cannot nest within itself', () => {
       const input = `${marker}${marker}outer ${marker}${marker}inner${marker}${marker} outer${marker}${marker}`;
-      const expected = `${tags[marker].open}outer ${tags[marker].close}inner${tags[marker].open} outer${tags[marker].close}`
+      const expected = `${tags[marker].open}outer ${tags[marker].close}inner${tags[marker].open} outer${tags[marker].close}`;
       const result = new SlydeMarkupRenderer().render(input);
       expect(result).toBe(expected);
     });
@@ -143,7 +143,6 @@ describe('class SlydeMarkup implements MarkupRender', () => {
       const result = new SlydeMarkupRenderer().render(input);
       expect(result).toBe(`${tags[marker].open}text${marker}${marker}${tags[marker].close}`);
     });
-
 
     // These markers have special properties.
     if (['``'].includes(`${marker}${marker}`)) {
