@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest';
+import { LatexRenderer } from '#lib/core/markup/languages/latex';
 import { SlydeMarkupRenderer } from '#lib/core/markup/languages/slyde';
 
-describe('class SlydeMarkup implements MarkupRender', () => {
+describe('class SlydeMarkup extends MarkupRender', () => {
   const markers = ['*', '/', '^', '_', '`', '~'] as const;
 
   const tags: Record<(typeof markers)[number], { open: string; close: string }> = {
@@ -12,6 +13,15 @@ describe('class SlydeMarkup implements MarkupRender', () => {
     '`': { close: '</code>', open: '<code>' },
     '~': { close: '</s>', open: '<s>' },
   };
+
+  test('rendering latex using the latex renderer', () => {
+    const input = `{x\\over2}`;
+    const result = new SlydeMarkupRenderer().render(`$$${input}$$`);
+    expect(result).not.toBe(input);
+    const normalized = (str:string):string => str.replace(/MJX-\d+/gu, 'MJX-ID');
+    const expected = new LatexRenderer().render(input);
+    expect(normalized(result)).toBe(normalized(expected));
+  });
 
   test('rendering link', () => {
     const input = `[this](http://example.com)`;

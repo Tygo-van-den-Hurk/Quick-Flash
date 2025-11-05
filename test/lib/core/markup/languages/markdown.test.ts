@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest';
+import { LatexRenderer } from '#lib/core/markup/languages/latex';
 import { MarkdownRenderer } from '#lib/core/markup/languages/markdown';
 
-describe('class MarkdownRenderer implements MarkupRender', () => {
+describe('class MarkdownRenderer extends MarkupRender', () => {
   test(`rendering an empty string to see if it stays a literal`, () => {
     const input = '';
     const result = new MarkdownRenderer().render(input);
@@ -14,6 +15,15 @@ describe('class MarkdownRenderer implements MarkupRender', () => {
     expect(result).toBe(input);
   });
 
+  test('rendering latex using the latex renderer', () => {
+    const input = `{x\\over2}`;
+    const result = new MarkdownRenderer().render(`$${input}$`);
+    expect(result).not.toBe(input);
+    const normalized = (str:string):string => str.replace(/MJX-\d+/gu, 'MJX-ID');
+    const expected = new LatexRenderer().render(input);
+    expect(normalized(result)).toBe(normalized(expected));
+  });
+  
   test(`rendering a marked for bold word`, () => {
     const input = `**word**`;
     const result = new MarkdownRenderer().render(input);
