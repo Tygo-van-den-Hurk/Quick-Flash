@@ -34,4 +34,13 @@ Now that you've added your own `Component` plugin you can simply use it using it
 
 ## Overriding existing Components
 
-Since plugins load after the original `Component`s load you can override existing `Component` names. This is intentional, in case an existing `Component` by that name does not suit your needs, however I do recommend adding it under a different name instead.
+Since plugins load after the original `Component`s load you can override existing `Component` names. This is intentional, in case an existing `Component` by that name does not suit your needs, however I do recommend adding it under a different name instead, however you got the option.
+
+## Styling
+
+Most of the lines of any `Component` plugin will most likely be the HTML output when rendering. That's why to make it as convenient to write your own components as possible I've added [tailwind](https://tailwindcss.com/) to the mix. You can use [tailwind](https://tailwindcss.com/) to define the looks of your component and the classes will be created for you dynamically later at runtime.
+
+There are a couple alterations to it though:
+
+1. all spacing has been overwritten to use `--unit`, which is a variable computed how large the current presentation window is. This is required because otherwise things would not stretch appropriately as the window scales
+2. you can only use the following colors: `foreground`, `background`, `primary`, and `secondary` as those are the only user definable colors. Using custom colors is discouraged but allowed using tailwinds custom classes.
