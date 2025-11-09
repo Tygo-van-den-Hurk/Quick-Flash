@@ -18,7 +18,7 @@ describe('class SlydeMarkup extends MarkupRender', () => {
     const input = `{x\\over2}`;
     const result = new SlydeMarkupRenderer().render(`$$${input}$$`);
     expect(result).not.toBe(input);
-    const normalized = (str:string):string => str.replace(/MJX-\d+/gu, 'MJX-ID');
+    const normalized = (str: string): string => str.replace(/MJX-\d+/gu, 'MJX-ID');
     const expected = new LatexRenderer().render(input);
     expect(normalized(result)).toBe(normalized(expected));
   });

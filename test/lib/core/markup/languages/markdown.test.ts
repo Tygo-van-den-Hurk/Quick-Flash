@@ -19,11 +19,11 @@ describe('class MarkdownRenderer extends MarkupRender', () => {
     const input = `{x\\over2}`;
     const result = new MarkdownRenderer().render(`$${input}$`);
     expect(result).not.toBe(input);
-    const normalized = (str:string):string => str.replace(/MJX-\d+/gu, 'MJX-ID');
+    const normalized = (str: string): string => str.replace(/MJX-\d+/gu, 'MJX-ID');
     const expected = new LatexRenderer().render(input);
     expect(normalized(result)).toBe(normalized(expected));
   });
-  
+
   test(`rendering a marked for bold word`, () => {
     const input = `**word**`;
     const result = new MarkdownRenderer().render(input);

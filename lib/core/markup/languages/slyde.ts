@@ -285,4 +285,3 @@ export class SlydeMarkupRenderer extends MarkupRenderer {
  */
 @MarkupRenderer.register
 export class DefaultMarkupRenderer extends SlydeMarkupRenderer {}
-
