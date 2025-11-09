@@ -18,7 +18,7 @@ export class Image extends Component {
   public readonly description?: string;
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public constructor(args: Readonly<Component.ConstructorArguments>) {
+  public constructor(args: Component.ConstructorArguments) {
     super(args);
 
     if (typeof args.attributes.source === 'string') {
@@ -41,7 +41,7 @@ export class Image extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Readonly<Component.RenderArguments>): string {
+  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
     const description = this.description ?? '';
     const { source } = this;
 

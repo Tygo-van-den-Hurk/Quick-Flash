@@ -52,7 +52,7 @@ export abstract class Component implements Component.Interface {
   /**
    * Creates a new `Component` from the arguments provided.
    */
-  public constructor(args: Readonly<ComponentConstructorArguments>) {
+  public constructor(args: Component.ConstructorArguments) {
     Logger.debug(`constructing ${new.target.name} at ${args.path.join('.')}`);
     this.attributes = args.attributes;
     this.focusMode = args.focusMode;
@@ -133,5 +133,5 @@ export abstract class Component implements Component.Interface {
   }
 
   public abstract hierarchy(): ReturnType<Component.Interface['hierarchy']>;
-  public abstract render(arg0: Readonly<Component.RenderArguments>): string;
+  public abstract render(arg0: Component.RenderArguments): ReturnType<Component.Interface['render']>;
 }

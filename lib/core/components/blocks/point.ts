@@ -1,33 +1,54 @@
 import * as zod from 'zod';
 import { Component } from '#lib/core/components/class';
 
-const typeOptions = ['circle', 'dash', 'star'] as const;
-const typeParser = zod.enum(typeOptions).default('dash');
+const symbolOptions = [
+  'circle',
+  'dash',
+  'star',
+  'arrow',
+  'square',
+  'diamond',
+  'check',
+  'cross',
+] as const;
+
+const symbolParser = zod.enum(symbolOptions).default('dash');
+
+const symbolMap: Record<zod.infer<typeof symbolParser>, string> = {
+  arrow: '&rarr;',
+  check: '&#10003;',
+  circle: '&bull;',
+  cross: '&#10006;',
+  dash: '&ndash;',
+  diamond: '&#9670;',
+  square: '&#9642;',
+  star: '&#9733;',
+};
 
 /**
  * A component that just shows bullet point.
  */
 @Component.register
 export class Point extends Component {
-  public readonly type: zod.infer<typeof typeParser>;
+  public readonly symbol: zod.infer<typeof symbolParser>;
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public constructor(args: Readonly<Component.ConstructorArguments>) {
+  public constructor(args: Component.ConstructorArguments) {
     super(args);
 
-    const result = typeParser.safeParse(args.attributes.type);
+    const result = symbolParser.safeParse(args.attributes.symbol);
     if (!result.success) {
       throw new Error(
         `Expected property "type" of ${Point.name} at ${this.path.join('.')} to be one` +
-          `of "${typeOptions.join('", "')}", but found: ${args.attributes.type}`
+          `of "${symbolOptions.join('", "')}", but found: ${args.attributes.type}`
       );
     }
 
-    this.type = result.data;
+    this.symbol = result.data;
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Readonly<Component.RenderArguments>): string {
+  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
     if (!children) {
       throw new Error(
         `Expected ${Point.name} at ${this.path.join('.')} to have children, but found none.`
@@ -36,9 +57,9 @@ export class Point extends Component {
 
     // eslint-disable-next-line no-inline-comments
     return /*HTML*/ `
-      <!--Point#${this.id}-->
+      <div class="pt-1 block before:content-['${symbolMap[this.symbol]}'] before:mr-2 before:text-black">
         ${children()}
-      <!--/Point#${this.id}-->
+      </div>
     `;
   }
 

@@ -12,7 +12,7 @@ export class TitleSlide extends Component {
   public readonly authors?: readonly string[];
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public constructor(args: Readonly<Component.ConstructorArguments>) {
+  public constructor(args: Component.ConstructorArguments) {
     super(args);
     this.title = args.attributes.title ?? 'Questions?';
 
@@ -24,15 +24,15 @@ export class TitleSlide extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Readonly<Component.RenderArguments>): string {
+  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
     let authors = '';
 
     if (this.authors) authors = `<p>${this.authors.join('<br>')}</p>`;
 
     // eslint-disable-next-line no-inline-comments
     return /*HTML*/ `
-      <div style="height:100%;width:100%;display:flex;justify-content:center;align-items: center;">
-        <h2>${this.title}</h2>
+      <div class="h-full w-full flex justify-center items-center">
+        <h2 class="text-primary font-bold text-lg">${this.title}</h2>
         ${authors}
         ${children?.() ?? ''}
       </div>

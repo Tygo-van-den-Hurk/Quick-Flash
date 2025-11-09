@@ -38,7 +38,7 @@ export interface ComponentConstructorArguments {
   /**
    * The path at which this element is located.
    */
-  path: readonly string[];
+  readonly path: readonly string[];
 
   /**
    * How deep the component is in the tree. For example if we look at the following presentation:
@@ -64,7 +64,7 @@ export interface ComponentRenderArguments {
    * Renders the children to HTML to and returns the output. If the component has no children then this function is
    * missing.
    */
-  children?: () => string;
+  readonly children?: () => string;
 }
 
 /**
@@ -85,18 +85,18 @@ export interface ComponentInterface extends ComponentConstructorArguments {
   /**
    * Render this component to HTML.
    */
-  render: (argo0: Readonly<ComponentRenderArguments>) => string;
+  readonly render: (argo0: Readonly<ComponentRenderArguments>) => string;
 
   /**
    * The levels at which this component is allowed to be used. End with a plus to allow any level deeper then the last
    * mentioned level. Cannot be empty, or only contain a plus. Use `'*'` to allow all levels.
    */
-  hierarchy: () => readonly [number, ...number[]] | readonly [...[number, ...number[]], '+'] | '*';
+  readonly hierarchy: () => readonly [number, ...number[]] | readonly [...[number, ...number[]], '+'] | '*';
 
   /**
    * Whether or not an instance of `Component` can be at a level `n`.
    */
-  canBeAtLevel: (level: number) => boolean;
+  readonly canBeAtLevel: (level: number) => boolean;
 }
 
 /**

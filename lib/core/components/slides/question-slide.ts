@@ -9,17 +9,17 @@ export class QuestionSlide extends Component {
   public readonly title: string;
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public constructor(args: Readonly<Component.ConstructorArguments>) {
+  public constructor(args: Component.ConstructorArguments) {
     super(args);
     this.title = args.attributes.title ?? 'Questions?';
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Readonly<Component.RenderArguments>): string {
+  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
     // eslint-disable-next-line no-inline-comments
     return /*HTML*/ `
-      <div style="height:100%;width:100%;display:flex;justify-content:center;align-items: center;">
-        <h2>${this.title}</h2>
+      <div class="h-full w-full flex justify-center items-center">
+        <h2 class="text-primary font-bold text-lg">${this.title}</h2>
         ${children?.() ?? ''}
       </div>
     `;

@@ -105,3 +105,42 @@ export const toDataURL = async function toDataURL(
     `Expected either a valid URL or an existing file path, but found neither: ${input} (resolved as: ${resolvedPath})`
   );
 };
+
+/** Extracts a key from a record even if it has aliases, or returns a fallback. */
+export function extract({
+  record,
+  aliases,
+  fallback,
+}: {
+  readonly record: Readonly<Record<string, string | undefined>>,
+  readonly aliases: readonly string[],
+  readonly fallback: string,
+}): string;
+
+/** Extracts a key from a record even if it has aliases, or returns a fallback. */
+export function extract({
+  record,
+  aliases,
+}: {
+  readonly record: Readonly<Record<string, string | undefined>>,
+  readonly aliases: readonly string[],
+}): string | undefined;
+
+/** Extracts a key from a record even if it has aliases, or returns a fallback. */
+export function extract({
+  record,
+  aliases,
+  fallback,
+}: {
+  readonly record: Readonly<Record<string, string | undefined>>,
+  readonly aliases: readonly string[],
+  readonly fallback?: string,
+}): string | undefined {
+  for (const alias of aliases) {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (record[alias]) {
+      return record[alias];
+    }
+  }
+  return fallback;
+}

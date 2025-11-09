@@ -1,16 +1,15 @@
+import { type SlydeHtmlDocumentHtmlProperties, htmlDocument } from "#lib/core/browser/index"
 import { Component } from '#lib/core/components/class';
-import { randomBytes } from 'crypto';
-
-// eslint-disable-next-line @typescript-eslint/no-magic-numbers
-const NONCE = randomBytes(16).toString('base64');
 
 const DEFAULT_TITLE = 'Untitled Presentation' as const;
 const DEFAULT_DESCRIPTION = 'This is a presentation made with Slyde.' as const;
-const DEFAULT_KEYWORDS = 'Slyde, presentation' as const;
+const DEFAULT_KEYWORDS = 'Slyde presentation' as const;
 const DEFAULT_AUTHOR = process.env.USER ?? process.env.USERNAME ?? 'an unknown author';
-const DEFAULT_BACKGROUND = '#FfFfFf';
-const DEFAULT_FOREGROUND = '#000000';
-const DEFAULT_ACCENT = '#3B82F6';
+const DEFAULT_BACKGROUND = '#FfFfFf' as const;
+const DEFAULT_FOREGROUND = '#000000' as const;
+const DEFAULT_PRIMARY = '#3B82F6' as const;
+const DEFAULT_SECONDARY = "F59E0B" as const;
+const DEFAULT_SIZE = "80x45";
 const DEFAULT_ICON_URL = `data:image/svg+xml;base64,
 PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDov
 L3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMC4yMDQ0IDYyNS4wMDQ5IDY1Ny45OTk2
@@ -61,106 +60,139 @@ NzgxIDEuNzA2IFoiIHN0eWxlPSJmaWxsOiB1cmwoJnF1b3Q7I2xpbmVhckdyYWRpZW50Mzk1NyZx
 dW90Oyk7IHN0cm9rZS13aWR0aDogMS4wNjYzNzsiIGlkPSJwYXRoMzk1NyIvPgogIDwvZz4KPC9z
 dmc+Cg==`.replace(/[\s\n]+/gu, '');
 
+/** Extracts the size from a string, or returns a fallback. */
+const extractSize = function extractSize({
+  record, aliases, path, 
+}: Readonly<
+  Omit<Parameters<typeof Component.utils.extract>[0], "fallback"> & { path: Component.Interface["path"] }
+>): SlydeHtmlDocumentHtmlProperties["size"] {
+  const size = Component.utils.extract({
+    aliases, 
+    fallback: DEFAULT_SIZE,
+    record,
+  });
+
+  const regex = /(?<width>\d+)x(?<height>\d+)/ui;
+  const match = regex.exec(size);
+  if (match?.groups) {
+    const height = parseInt(match.groups.height, 10);
+    const width = parseInt(match.groups.width, 10);
+    return { height, width };
+  } 
+
+  throw new Error(
+    `Expected size property to be of the form ${regex}, but found "${size}" at ${path.join('.')}`
+  );
+}
+
 /**
  * The encompassing `Presentation` object. Should hold all slides.
  */
 @Component.register
-export class Presentation extends Component {
-  /** The title of this presentation. */
+export class Presentation extends Component implements Omit<SlydeHtmlDocumentHtmlProperties, "content"> {
   public readonly title: string;
-
-  /** The icon of this presentation. */
   public readonly icon: string;
-
-  /** The authors of this presentation. */
-  public readonly authors: string;
-
-  /** The description of this presentation. */
+  public readonly authors: readonly string[];
   public readonly description: string;
-
-  /** The keywords of this presentation. */
-  public readonly keywords: string;
-
-  /** The background color of this presentation. */
+  public readonly keywords: readonly string[];
   public readonly background: string;
-
-  /** The foreground color of this presentation. */
   public readonly foreground: string;
+  public readonly nonce?: string | undefined;
+  public readonly primary: string;
+  public readonly secondary: string;
+  public readonly size: { readonly height: number; readonly width: number; };
 
-  /** The foreground color of this presentation. */
-  public readonly accent: string;
-
-  // eslint-disable-next-line jsdoc/require-jsdoc
-  public constructor(args: Readonly<Component.ConstructorArguments>) {
+  // eslint-disable-next-line jsdoc/require-jsdoc, max-lines-per-function
+  public constructor(args: Component.ConstructorArguments) {
     super(args);
 
-    this.icon = args.attributes.icon ?? DEFAULT_ICON_URL;
-    this.keywords = args.attributes.keywords ?? DEFAULT_KEYWORDS;
-    this.description = args.attributes.description ?? args.attributes.alt ?? DEFAULT_DESCRIPTION;
-    this.authors =
-      args.attributes.authors ?? args.attributes.author ?? args.attributes.by ?? DEFAULT_AUTHOR;
-    this.background =
-      args.attributes.background ?? args.attributes['background-color'] ?? DEFAULT_BACKGROUND;
-    this.foreground =
-      args.attributes.foreground ?? args.attributes['foreground-color'] ?? DEFAULT_FOREGROUND;
-    this.accent = args.attributes.accent ?? args.attributes['accent-color'] ?? DEFAULT_ACCENT;
-    this.title = args.attributes.title ?? DEFAULT_TITLE;
+    this.title = Component.utils.extract({
+      aliases: ["title"],
+      fallback: DEFAULT_TITLE,
+      record: args.attributes,
+    });
+
+    this.description = Component.utils.extract({
+      aliases: ["description", "alt"],
+      fallback: DEFAULT_DESCRIPTION,
+      record: args.attributes,
+    });
+
+    this.authors = Component.utils.extract({
+      aliases: ["authors", "author", "by"],
+      fallback: DEFAULT_AUTHOR,
+      record: args.attributes,
+    }).split(',');
+
+    this.keywords = Component.utils.extract({
+      aliases: ["keywords", "tags"],
+      fallback: DEFAULT_KEYWORDS,
+      record: args.attributes,
+    }).split(',');
+
+    this.icon = Component.utils.extract({
+      aliases: ["icon"],
+      fallback: DEFAULT_ICON_URL,
+      record: args.attributes,
+    });
+
+    this.background = Component.utils.extract({
+      aliases: ["background", "background-color"],
+      fallback: DEFAULT_BACKGROUND,
+      record: args.attributes,
+    });
+
+    this.foreground = Component.utils.extract({
+      aliases: ["foreground", "foreground-color"],
+      fallback: DEFAULT_FOREGROUND,
+      record: args.attributes,
+    });
+
+    this.primary = Component.utils.extract({
+      aliases: ["primary", "primary-color"],
+      fallback: DEFAULT_PRIMARY,
+      record: args.attributes,
+    });
+
+    this.secondary = Component.utils.extract({
+      aliases: ["secondary", "secondary-color"],
+      fallback: DEFAULT_SECONDARY,
+      record: args.attributes,
+    });
+
+    this.size = extractSize({
+      aliases: ["size"],
+      path: this.path,
+      record: args.attributes,
+    });
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Readonly<Component.RenderArguments>): string {
+  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
     if (!children) {
       throw new Error(
         `${Component.name} ${Presentation.name} expected to have children, but found none at ${this.path.join('.')}.`
       );
     }
-
+    
     // eslint-disable-next-line no-inline-comments
-    return /*HTML*/ `<!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <title>${this.title}</title>
-          <!-- Meta -->
-          <meta charset="UTF-8">
-          <meta name="darkreader-lock">
-          <meta property="og:title" content="${this.title}">
-          <meta property="og:description" content="${this.description}">
-          <meta property="og:image" content="${this.icon}">
-          <meta name="keywords" content="${this.keywords}">
-          <meta name="description" content="${this.description}">
-          <meta name="authors" content="${this.authors}">
-          <meta name="msapplication-TileImage" content="${this.icon}" />
-          <meta name="msapplication-TileColor" content="${this.background}" />
-          <meta name="theme-color" content="${this.accent}" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-          <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; script-src 'self' 'nonce-${NONCE}';">
-          <!-- Links -->
-          <link rel="icon" href="${this.icon}">
-          <link rel="apple-touch-icon" href="${this.icon}">
-          <!-- Style & Script -->
-          <script nonce="${NONCE}"> /* JS ALLOWED */ </script>
-          <style> 
-            :root { 
-              --background-color: "${this.background}";
-              --foreground-color: "${this.foreground}";
-              --accent-color: "${this.accent}";
-            } * {
-              background-color: var(--background-color);
-              color: var(--foreground-color); 
-            } 
-          </style>
-        </head>
-        <body>
-          <main>
-            ${children()}
-          </main>
-        </body>
-      </html>
+    const content = /*HTML*/ `
+      <main>
+        ${children()}
+      </main>
     `;
+
+    // eslint-disable-next-line @typescript-eslint/no-misused-spread
+    return this.htmlDocument({ ...this, content });
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public hierarchy(): ReturnType<Component['hierarchy']> {
     return [0];
   }
+
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
+  public htmlDocument(arg0: SlydeHtmlDocumentHtmlProperties): ReturnType<typeof htmlDocument> {
+    return htmlDocument({ ...arg0});
+  } 
 }

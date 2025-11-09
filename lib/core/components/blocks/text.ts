@@ -6,12 +6,12 @@ import { Component } from '#lib/core/components/class';
 @Component.register
 export class Text extends Component {
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public constructor(args: Readonly<Component.ConstructorArguments>) {
+  public constructor(args: Component.ConstructorArguments) {
     super(args);
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Readonly<Component.RenderArguments>): string {
+  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
     if (!children) {
       throw new Error(
         `${Text.name} at ${this.path.join('.')} expected to have children, but found none.`
@@ -19,7 +19,7 @@ export class Text extends Component {
     }
 
     // eslint-disable-next-line no-inline-comments
-    return /*HTML*/ `<p>${children()}</p>`;
+    return /*HTML*/ `<div class="block py-2">${children()}</div>`;
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc

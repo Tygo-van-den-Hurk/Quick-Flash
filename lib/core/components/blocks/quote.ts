@@ -10,32 +10,44 @@ export class Quote extends Component {
    * Who said the quote.
    */
   public readonly by: string;
+  /**
+   * A link to the source of the quote.
+   */
+  public readonly cite?: string;
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public constructor(args: Readonly<Component.ConstructorArguments>) {
+  public constructor(args: Component.ConstructorArguments) {
     super(args);
 
     if (typeof args.attributes.by === 'string') {
       this.by = args.attributes.by;
-    } else if (typeof args.attributes.cite === 'string') {
-      this.by = args.attributes.cite;
     } else {
       Logger.warn(`${Quote.name} at ${this.path.join('.')} is missing attribute "by".`);
       this.by = 'Unknown';
     }
+    
+    if (typeof args.attributes.by === 'string') {
+      this.cite = args.attributes.cite;
+    } else {
+      Logger.warn(`${Quote.name} at ${this.path.join('.')} is missing attribute "cite".`);
+    }
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Readonly<Component.RenderArguments>): string {
+  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
     if (!children) {
       throw new Error(
         `Expected ${Quote.name} at ${this.path.join('.')} to have children, but found none.`
       );
     }
 
+    let cite = '';
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (this.cite) cite = `cite="${this.cite}"`;
+
     // eslint-disable-next-line no-inline-comments
     return /*HTML*/ `
-      <blockquote cite="https://example.com/source">
+      <blockquote ${cite}>
         <p>${children()}</p>
         <footer><cite>${this.by}</cite></footer>
       </blockquote>
