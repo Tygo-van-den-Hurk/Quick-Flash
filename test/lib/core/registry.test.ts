@@ -3,12 +3,12 @@
 import {
   Registry,
   type RegistryConstructorArguments,
-  type RequireAll,
   addXmlNameSpace,
   createVariations,
   createVariationsByRemovingSubstring,
-} from '#lib';
+} from '#lib/core/registry';
 import { describe, expect, test } from 'vitest';
+import type { RequireAll } from '#lib/types';
 
 // Tests: createVariations
 
