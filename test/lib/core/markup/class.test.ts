@@ -9,7 +9,7 @@ describe('implements MarkupRender', () => {
 
   test(`MarkupRenderer.Keys() includes the name of a class we register`, () => {
     @MarkupRenderer.register
-    class ABCDEFG implements MarkupRenderer {
+    class ABCDEFG extends MarkupRenderer {
       // eslint-disable-next-line @typescript-eslint/class-methods-use-this
       public render = (input: string): string => input;
     }
