@@ -95,7 +95,7 @@ export const addXmlNameSpace = function addXmlNameSpace(
 };
 
 /** A type any class would have. As they all have a constructor.*/
-export type Class<T> = new (...args: unknown[]) => T;
+export type Class<T> = (abstract new (...args: unknown[]) => T) | (new (...args: unknown[]) => T);
 
 /** The interface the constructor of a `Registry` expects. */
 export interface RegistryConstructorArguments {
@@ -115,10 +115,15 @@ export interface RegistryConstructorArguments {
 
 /** A class that has registry functions. */
 export type ClassAugmentedWithRegistry<C extends Class<object>> = C & {
+  /** The internal registry. */
   registry: Registry<C>;
+  /** Add a member from the internal registry using the default parameters. */
   register: Registry<C>['register'];
+  /** Get a member from the internal registry by name. */
   retrieve: Registry<C>['retrieve'];
+  /** Add a member to the internal registry. */
   add: Registry<C>['add'];
+  /** Get the keys of all registered members. */
   keys: Registry<C>['keys'];
 };
 
@@ -128,12 +133,12 @@ export class Registry<T extends Class<object>> implements RequireAll<RegistryCon
   // eslint-disable-next-line @typescript-eslint/naming-convention
   public static readonly inject = Object.assign(
     <C extends Class<object>>(cls: C): ClassAugmentedWithRegistry<C> =>
-      Registry.injectHelper(cls, { name: cls.name }),
+      Registry.injectHelper<C>(cls, { name: cls.name }),
     {
       with:
-        <C extends Class<object>>(opts: Partial<RegistryConstructorArguments>) =>
-        (cls: C): ClassAugmentedWithRegistry<C> =>
-          Registry.injectHelper(cls, {
+        (opts: Partial<RegistryConstructorArguments>) =>
+        <C extends Class<object>>(cls: C): ClassAugmentedWithRegistry<C> =>
+          Registry.injectHelper<C>(cls, {
             ...opts,
             name: opts.name ?? cls.name,
           }),
@@ -154,11 +159,11 @@ export class Registry<T extends Class<object>> implements RequireAll<RegistryCon
    * - `@Class.register.with({ plugin: true })`: allows you to register it as a plugin or not.
    * - `@Class.register.with({ aliases: ['alias1', 'alias2'] })`: called with custom aliases
    */
-  public readonly register = Object.assign(<C extends T>(target: C): C => this.add(target), {
+  public readonly register = Object.assign(<C extends T>(target: C): C => this.add<C>(target), {
     with:
       ({ aliases, name }: { readonly aliases?: readonly string[]; readonly name?: string }) =>
       <C extends T>(target: C): C =>
-        this.add(target, { aliases, name }),
+        this.add<C>(target, { aliases, name }),
   });
 
   /** The internal registry of a `Registry`. */
