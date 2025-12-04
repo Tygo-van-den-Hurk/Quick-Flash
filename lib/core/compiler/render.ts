@@ -47,17 +47,18 @@ export const getAttributes = function getAttributes(str: string): Attribute[] {
   const results: Attribute[] = [];
 
   let match; // eslint-disable-line @typescript-eslint/init-declarations
-  while ((match = regex.exec(str)) !== null) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-    const { name, value } = match.groups as unknown as Attribute;
-    results.push({ name: name.trim(), value: stripQuotes(value.trim()) });
+  while ((match = regex.exec(str)) !== null && match.groups) {
+    results.push({
+      name: match.groups.name.trim(),
+      value: stripQuotes(match.groups.value.trim()),
+    });
   }
 
   return results;
 };
 
 /** Get a `MarkupRenderer` by name or throw if it does not exist. */
-export const getMarkupRenderer = function getMarkupRenderer(name: string): MarkupRenderer {
+export const getMarkupRenderer = function getMarkupRenderer(name: string): MarkupRenderer.Instance {
   const MarkupRendererInstance = MarkupRenderer.retrieve(name);
   if (MarkupRendererInstance) return new MarkupRendererInstance();
   throw new Error(
@@ -72,7 +73,7 @@ export const createComponentInstance = function createComponentInstance(
   element: XmlParserElementNode,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   state: State
-): Component {
+): Component.Instance {
   const ComponentInstance = Component.retrieve(element.name);
   if (!ComponentInstance) {
     throw new Error(

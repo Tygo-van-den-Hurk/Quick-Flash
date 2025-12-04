@@ -96,7 +96,7 @@ describe('class Registry', () => {
     const extensiveAliases = false;
     const name = 'test-1';
     const substrings = [] as readonly string[];
-    const Class = Registry.inject.with({ extensiveAliases, name, substrings })(
+    const Class = Registry.inject.using({ extensiveAliases, name, substrings })(
       class Class {
         public str?: string;
       }
@@ -112,7 +112,7 @@ describe('class Registry', () => {
     const extensiveAliases = false;
     const name = 'test-1';
     const substrings = [] as readonly string[];
-    const Class = Registry.inject.with({ extensiveAliases, name, substrings })(
+    const Class = Registry.inject.using({ extensiveAliases, name, substrings })(
       class Class {
         public str?: string;
       }
@@ -125,11 +125,11 @@ describe('class Registry', () => {
     expect(Class.retrieve(Class2.name)).toStrictEqual(Class2);
   });
 
-  test('Registry.register.with({ ... })(class C {})', () => {
+  test('Registry.register.using({ ... })(class C {})', () => {
     const extensiveAliases = false;
     const name = 'test-2';
     const substrings = [] as readonly string[];
-    const Class = Registry.inject.with({ extensiveAliases, name, substrings })(
+    const Class = Registry.inject.using({ extensiveAliases, name, substrings })(
       class Class {
         public str?: string;
       }
@@ -141,7 +141,7 @@ describe('class Registry', () => {
     expect(Class.keys()).not.toContain(newName);
     expect(Class.keys()).not.toContain(Class2.name);
     for (const alias of aliases) expect(Class.keys()).not.toContain(alias);
-    Class.register.with({ aliases, name: newName })(Class2);
+    Class.register.using({ aliases, name: newName })(Class2);
     expect(Class.keys()).not.toContain(Class2.name);
     for (const alias of aliases) expect(Class.keys()).toContain(alias);
     expect(Class.keys()).toContain(newName);

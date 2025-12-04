@@ -1,4 +1,4 @@
-import { type SlydeHtmlDocumentHtmlProperties, htmlDocument } from "#lib/core/browser/index"
+import { type SlydeHtmlDocumentHtmlProperties, htmlDocument } from '#lib/core/browser/index';
 import { Component } from '#lib/core/components/class';
 
 const DEFAULT_TITLE = 'Untitled Presentation' as const;
@@ -8,8 +8,8 @@ const DEFAULT_AUTHOR = process.env.USER ?? process.env.USERNAME ?? 'an unknown a
 const DEFAULT_BACKGROUND = '#FfFfFf' as const;
 const DEFAULT_FOREGROUND = '#000000' as const;
 const DEFAULT_PRIMARY = '#3B82F6' as const;
-const DEFAULT_SECONDARY = "F59E0B" as const;
-const DEFAULT_SIZE = "80x45";
+const DEFAULT_SECONDARY = 'F59E0B' as const;
+const DEFAULT_SIZE = '80x45';
 const DEFAULT_ICON_URL = `data:image/svg+xml;base64,
 PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDov
 L3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMC4yMDQ0IDYyNS4wMDQ5IDY1Ny45OTk2
@@ -62,34 +62,41 @@ dmc+Cg==`.replace(/[\s\n]+/gu, '');
 
 /** Extracts the size from a string, or returns a fallback. */
 const extractSize = function extractSize({
-  record, aliases, path, 
+  record,
+  aliases,
+  path,
 }: Readonly<
-  Omit<Parameters<typeof Component.utils.extract>[0], "fallback"> & { path: Component.Interface["path"] }
->): SlydeHtmlDocumentHtmlProperties["size"] {
+  Omit<Parameters<typeof Component.utils.extract>[0], 'fallback'> & {
+    path: Component.Interface['path'];
+  }
+>): SlydeHtmlDocumentHtmlProperties['size'] {
   const size = Component.utils.extract({
-    aliases, 
+    aliases,
     fallback: DEFAULT_SIZE,
     record,
   });
 
-  const regex = /(?<width>\d+)x(?<height>\d+)/ui;
+  const regex = /(?<width>\d+)x(?<height>\d+)/iu;
   const match = regex.exec(size);
   if (match?.groups) {
     const height = parseInt(match.groups.height, 10);
     const width = parseInt(match.groups.width, 10);
     return { height, width };
-  } 
+  }
 
   throw new Error(
     `Expected size property to be of the form ${regex}, but found "${size}" at ${path.join('.')}`
   );
-}
+};
 
 /**
  * The encompassing `Presentation` object. Should hold all slides.
  */
-@Component.register
-export class Presentation extends Component implements Omit<SlydeHtmlDocumentHtmlProperties, "content"> {
+@Component.register.using({ plugin: false })
+export class Presentation
+  extends Component
+  implements Omit<SlydeHtmlDocumentHtmlProperties, 'content'>
+{
   public readonly title: string;
   public readonly icon: string;
   public readonly authors: readonly string[];
@@ -100,81 +107,87 @@ export class Presentation extends Component implements Omit<SlydeHtmlDocumentHtm
   public readonly nonce?: string | undefined;
   public readonly primary: string;
   public readonly secondary: string;
-  public readonly size: { readonly height: number; readonly width: number; };
+  public readonly size: { readonly height: number; readonly width: number };
 
   // eslint-disable-next-line jsdoc/require-jsdoc, max-lines-per-function
   public constructor(args: Component.ConstructorArguments) {
     super(args);
 
     this.title = Component.utils.extract({
-      aliases: ["title"],
+      aliases: ['title'],
       fallback: DEFAULT_TITLE,
       record: args.attributes,
     });
 
     this.description = Component.utils.extract({
-      aliases: ["description", "alt"],
+      aliases: ['description', 'alt'],
       fallback: DEFAULT_DESCRIPTION,
       record: args.attributes,
     });
 
-    this.authors = Component.utils.extract({
-      aliases: ["authors", "author", "by"],
-      fallback: DEFAULT_AUTHOR,
-      record: args.attributes,
-    }).split(',');
+    this.authors = Component.utils
+      .extract({
+        aliases: ['authors', 'author', 'by'],
+        fallback: DEFAULT_AUTHOR,
+        record: args.attributes,
+      })
+      .split(',');
 
-    this.keywords = Component.utils.extract({
-      aliases: ["keywords", "tags"],
-      fallback: DEFAULT_KEYWORDS,
-      record: args.attributes,
-    }).split(',');
+    this.keywords = Component.utils
+      .extract({
+        aliases: ['keywords', 'tags'],
+        fallback: DEFAULT_KEYWORDS,
+        record: args.attributes,
+      })
+      .split(',');
 
     this.icon = Component.utils.extract({
-      aliases: ["icon"],
+      aliases: ['icon'],
       fallback: DEFAULT_ICON_URL,
       record: args.attributes,
     });
 
     this.background = Component.utils.extract({
-      aliases: ["background", "background-color"],
+      aliases: ['background', 'background-color'],
       fallback: DEFAULT_BACKGROUND,
       record: args.attributes,
     });
 
     this.foreground = Component.utils.extract({
-      aliases: ["foreground", "foreground-color"],
+      aliases: ['foreground', 'foreground-color'],
       fallback: DEFAULT_FOREGROUND,
       record: args.attributes,
     });
 
     this.primary = Component.utils.extract({
-      aliases: ["primary", "primary-color"],
+      aliases: ['primary', 'primary-color'],
       fallback: DEFAULT_PRIMARY,
       record: args.attributes,
     });
 
     this.secondary = Component.utils.extract({
-      aliases: ["secondary", "secondary-color"],
+      aliases: ['secondary', 'secondary-color'],
       fallback: DEFAULT_SECONDARY,
       record: args.attributes,
     });
 
     this.size = extractSize({
-      aliases: ["size"],
+      aliases: ['size'],
       path: this.path,
       record: args.attributes,
     });
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
+  public render({
+    children,
+  }: Component.RenderArguments): ReturnType<Component.Interface['render']> {
     if (!children) {
       throw new Error(
         `${Component.name} ${Presentation.name} expected to have children, but found none at ${this.path.join('.')}.`
       );
     }
-    
+
     // eslint-disable-next-line no-inline-comments
     const content = /*HTML*/ `
       <main>
@@ -187,12 +200,12 @@ export class Presentation extends Component implements Omit<SlydeHtmlDocumentHtm
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
-  public hierarchy(): ReturnType<Component['hierarchy']> {
+  public hierarchy(): ReturnType<Component.Interface['hierarchy']> {
     return [0];
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public htmlDocument(arg0: SlydeHtmlDocumentHtmlProperties): ReturnType<typeof htmlDocument> {
-    return htmlDocument({ ...arg0});
-  } 
+    return htmlDocument({ ...arg0 });
+  }
 }

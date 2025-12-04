@@ -3,7 +3,7 @@ import { Component } from '#lib/core/components/class';
 /**
  * A component that just shows text.
  */
-@Component.register
+@Component.register.using({ plugin: false })
 export class Text extends Component {
   // eslint-disable-next-line jsdoc/require-jsdoc
   public constructor(args: Component.ConstructorArguments) {
@@ -11,7 +11,9 @@ export class Text extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
+  public render({
+    children,
+  }: Component.RenderArguments): ReturnType<Component.Interface['render']> {
     if (!children) {
       throw new Error(
         `${Text.name} at ${this.path.join('.')} expected to have children, but found none.`
@@ -23,7 +25,7 @@ export class Text extends Component {
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
-  public hierarchy(): ReturnType<Component['hierarchy']> {
+  public hierarchy(): ReturnType<Component.Interface['hierarchy']> {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     return [2, '+'];
   }

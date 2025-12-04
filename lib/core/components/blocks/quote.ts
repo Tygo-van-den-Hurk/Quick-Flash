@@ -4,7 +4,7 @@ import { Logger } from '#lib/logger';
 /**
  * The `Quote` component. Shows a quote by somebody.
  */
-@Component.register
+@Component.register.using({ plugin: false })
 export class Quote extends Component {
   /**
    * Who said the quote.
@@ -25,7 +25,7 @@ export class Quote extends Component {
       Logger.warn(`${Quote.name} at ${this.path.join('.')} is missing attribute "by".`);
       this.by = 'Unknown';
     }
-    
+
     if (typeof args.attributes.by === 'string') {
       this.cite = args.attributes.cite;
     } else {
@@ -34,7 +34,9 @@ export class Quote extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
+  public render({
+    children,
+  }: Component.RenderArguments): ReturnType<Component.Interface['render']> {
     if (!children) {
       throw new Error(
         `Expected ${Quote.name} at ${this.path.join('.')} to have children, but found none.`
@@ -55,7 +57,7 @@ export class Quote extends Component {
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
-  public hierarchy(): ReturnType<Component['hierarchy']> {
+  public hierarchy(): ReturnType<Component.Interface['hierarchy']> {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     return [2, '+'];
   }

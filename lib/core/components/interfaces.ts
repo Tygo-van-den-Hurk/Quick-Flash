@@ -91,7 +91,10 @@ export interface ComponentInterface extends ComponentConstructorArguments {
    * The levels at which this component is allowed to be used. End with a plus to allow any level deeper then the last
    * mentioned level. Cannot be empty, or only contain a plus. Use `'*'` to allow all levels.
    */
-  readonly hierarchy: () => readonly [number, ...number[]] | readonly [...[number, ...number[]], '+'] | '*';
+  readonly hierarchy: () =>
+    | readonly [number, ...number[]]
+    | readonly [...[number, ...number[]], '+']
+    | '*';
 
   /**
    * Whether or not an instance of `Component` can be at a level `n`.

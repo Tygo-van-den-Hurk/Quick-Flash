@@ -31,7 +31,7 @@ parser.use({ extensions: [latex1Extension] });
 /**
  * A `MarkupRenderer` for Markdown.
  */
-@MarkupRenderer.register
+@MarkupRenderer.register.using({ plugin: false })
 export class MarkdownRenderer extends MarkupRenderer {
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public render(input: string): string {

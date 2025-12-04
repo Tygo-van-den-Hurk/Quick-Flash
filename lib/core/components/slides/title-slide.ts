@@ -3,7 +3,7 @@ import { Component } from '#lib/core/components/class';
 /**
  * A `Slide` with the title and possibly the author
  */
-@Component.register
+@Component.register.using({ plugin: false })
 export class TitleSlide extends Component {
   /** The title of this slide. */
   public readonly title: string;
@@ -24,7 +24,9 @@ export class TitleSlide extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
+  public render({
+    children,
+  }: Component.RenderArguments): ReturnType<Component.Interface['render']> {
     let authors = '';
 
     if (this.authors) authors = `<p>${this.authors.join('<br>')}</p>`;
@@ -40,7 +42,7 @@ export class TitleSlide extends Component {
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
-  public hierarchy(): ReturnType<Component['hierarchy']> {
+  public hierarchy(): ReturnType<Component.Interface['hierarchy']> {
     return [1];
   }
 }

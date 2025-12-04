@@ -1,11 +1,10 @@
-/* eslint-disable max-classes-per-file */
 import { Component } from '#lib/core/components/class';
 import { Logger } from '#lib/logger';
 
 /**
  * The `Image` component. Shows an image.
  */
-@Component.register
+@Component.register.using({ aliases: ['Img'], plugin: false })
 export class Image extends Component {
   /**
    * The source of the image.
@@ -41,7 +40,9 @@ export class Image extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
+  public render({
+    children,
+  }: Component.RenderArguments): ReturnType<Component.Interface['render']> {
     const description = this.description ?? '';
     const { source } = this;
 
@@ -52,16 +53,8 @@ export class Image extends Component {
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
-  public hierarchy(): ReturnType<Component['hierarchy']> {
+  public hierarchy(): ReturnType<Component.Interface['hierarchy']> {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     return [2, '+'];
   }
-}
-
-/**
- * The `img` component. Shows an image. Alias for `Image`
- */
-@Component.register
-export class Img extends Image {
-  // Just functions as an alias to <image>.
 }

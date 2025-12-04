@@ -20,7 +20,7 @@ const document: MathDocument<LiteElement, string, string> = mathjax.document('',
 /**
  * A MarkupRenderer for Markdown that converts LaTeX (in math mode) into an inline SVG.
  */
-@MarkupRenderer.register
+@MarkupRenderer.register.using({ plugin: false })
 export class LatexRenderer extends MarkupRenderer {
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public render(input: string): string {

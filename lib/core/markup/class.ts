@@ -8,15 +8,21 @@ abstract class MarkupRenderer implements MarkupRendererInterface {
 
 /**
  * The base class for any `MarkupRenderer`. A `MarkupRenderer` is responsible for rendering it's specific
- * [markup languages](https://en.wikipedia.org/wiki/Markup_language) into HTML. Examples of this are: 
- * [Markdown](https://en.wikipedia.org/wiki/Markdown), [XML](https://en.wikipedia.org/wiki/XML), and of 
+ * [markup languages](https://en.wikipedia.org/wiki/Markup_language) into HTML. Examples of this are:
+ * [Markdown](https://en.wikipedia.org/wiki/Markdown), [XML](https://en.wikipedia.org/wiki/XML), and of
  * course [HTML](https://en.wikipedia.org/wiki/HTML).
  */
-const MarkupRendererWithRegistry = Registry.inject.with({
+const MarkupRendererWithRegistry = Registry.inject.using({
   extensiveAliases: true,
   name: MarkupRenderer.name,
   substrings: ['MarkupRenderer', 'Markup', 'MarkupLanguage', 'Renderer'],
 })(MarkupRenderer);
+
+// eslint-disable-next-line @typescript-eslint/no-namespace, @typescript-eslint/no-redeclare
+declare namespace MarkupRendererWithRegistry {
+  /** The type for an instance of a `MarkupRenderer`. */
+  export type Instance = MarkupRenderer;
+}
 
 // eslint-disable-next-line jsdoc/require-jsdoc
 export { MarkupRendererWithRegistry as MarkupRenderer };

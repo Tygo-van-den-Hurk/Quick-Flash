@@ -1,5 +1,3 @@
-/* eslint-disable max-classes-per-file */
-
 import { Marked, type Token } from 'marked';
 import { MarkupRenderer } from '#lib/core/markup/class';
 import { latex2Extension } from '#lib/core/markup/languages/latex';
@@ -272,16 +270,10 @@ parser.use({ extensions: [...slydeMarkedExtensions] });
 /**
  * A `MarkupRenderer` for Slyde' unique markup language.
  */
-@MarkupRenderer.register
+@MarkupRenderer.register.using({ aliases: ['DefaultMarkupRenderer'], plugin: false })
 export class SlydeMarkupRenderer extends MarkupRenderer {
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
   public render(input: string): string {
     return parser.parse(input, { async: false });
   }
 }
-
-/**
- * The default `MarkupRenderer`, just a copy of `SlydeMarkupRenderer`.
- */
-@MarkupRenderer.register
-export class DefaultMarkupRenderer extends SlydeMarkupRenderer {}

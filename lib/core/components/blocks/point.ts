@@ -12,9 +12,11 @@ const symbolOptions = [
   'cross',
 ] as const;
 
-const symbolParser = zod.enum(symbolOptions).default('dash');
+const symbolParser = zod.enum(symbolOptions);
 
-const symbolMap: Record<zod.infer<typeof symbolParser>, string> = {
+type Symbol = zod.infer<typeof symbolParser>;
+
+const symbolMap: Record<Symbol, string> = {
   arrow: '&rarr;',
   check: '&#10003;',
   circle: '&bull;',
@@ -25,10 +27,12 @@ const symbolMap: Record<zod.infer<typeof symbolParser>, string> = {
   star: '&#9733;',
 };
 
+const defaultSymbol = 'dash' as Symbol;
+
 /**
  * A component that just shows bullet point.
  */
-@Component.register
+@Component.register.using({ plugin: false })
 export class Point extends Component {
   public readonly symbol: zod.infer<typeof symbolParser>;
 
@@ -36,11 +40,18 @@ export class Point extends Component {
   public constructor(args: Component.ConstructorArguments) {
     super(args);
 
-    const result = symbolParser.safeParse(args.attributes.symbol);
-    if (!result.success) {
+    const aliases = ['symbol', 'type'] as readonly string[];
+    const extracted = Component.utils.extract({
+      aliases,
+      fallback: defaultSymbol,
+      record: args.attributes,
+    });
+
+    const result = symbolParser.safeParse(extracted);
+    if (result.error) {
       throw new Error(
-        `Expected property "type" of ${Point.name} at ${this.path.join('.')} to be one` +
-          `of "${symbolOptions.join('", "')}", but found: ${args.attributes.type}`
+        `Expected property by the names of "${aliases.join('", "')}" of ${Point.name} at ${this.path.join('.')} to ` +
+          `be one of "${symbolOptions.join('", "')}", but found: ${args.attributes.type}`
       );
     }
 
@@ -48,7 +59,9 @@ export class Point extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
+  public render({
+    children,
+  }: Component.RenderArguments): ReturnType<Component.Interface['render']> {
     if (!children) {
       throw new Error(
         `Expected ${Point.name} at ${this.path.join('.')} to have children, but found none.`
@@ -64,7 +77,7 @@ export class Point extends Component {
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
-  public hierarchy(): ReturnType<Component['hierarchy']> {
+  public hierarchy(): ReturnType<Component.Interface['hierarchy']> {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     return [2, '+'];
   }

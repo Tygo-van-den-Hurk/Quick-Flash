@@ -6,7 +6,7 @@ const divideBy2 = (num: number): number => num / 2;
 /**
  * The `Slide` object. Should be the standard 2nd tier object.
  */
-@Component.register
+@Component.register.using({ plugin: false })
 export class Slide extends Component {
   /** The title of this slide. */
   public readonly title?: string;
@@ -24,7 +24,9 @@ export class Slide extends Component {
   }
 
   // eslint-disable-next-line jsdoc/require-jsdoc
-  public render({ children }: Component.RenderArguments): ReturnType<Component['render']> {
+  public render({
+    children,
+  }: Component.RenderArguments): ReturnType<Component.Interface['render']> {
     if (typeof this.title === 'string')
       // eslint-disable-next-line no-inline-comments
       return /*HTML*/ `
@@ -45,7 +47,7 @@ export class Slide extends Component {
   }
 
   // eslint-disable-next-line @typescript-eslint/class-methods-use-this, jsdoc/require-jsdoc
-  public hierarchy(): ReturnType<Component['hierarchy']> {
+  public hierarchy(): ReturnType<Component.Interface['hierarchy']> {
     return [1];
   }
 }

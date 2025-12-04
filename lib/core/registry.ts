@@ -18,22 +18,22 @@
  * \@Component.register
  * class Text extends Component {}
  *
- * \@Component.register.with({ name: "Point" })
+ * \@Component.register.using({ name: "Point" })
  * class BulletPointComponent extends Component {}
  *
- * \@Component.register.with({ aliases: ['Img'] })
+ * \@Component.register.using({ aliases: ['Img'] })
  * class Image extends Component {}
  *
- * \@Component.register.with({ plugin: true })
+ * \@Component.register.using({ plugin: true })
  * class Plugin extends Component {}
  * ```
  *
  * See the register function definition for the defaults.
  */
 //
-import { FromPascalCase } from '#lib/utils';
+import type { DeepReadonly, RequireAll } from '#lib/types';
+import { FromPascalCase } from '#lib/utils/index';
 import { Logger } from '#lib/logger';
-import type { RequireAll } from '#lib/types';
 
 /**
  * Adds a bunch of variations of a given name in the array such as upper case, lower case kebab-case...
@@ -94,8 +94,16 @@ export const addXmlNameSpace = function addXmlNameSpace(
   );
 };
 
+/** A type any concreet class would have. As they all have a constructor.*/
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ConcreetClass<T> = new (...args: any[]) => T;
+
+/** A type any abstract class would have. As they all have a constructor.*/
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AbstractClass<T> = abstract new (...args: any[]) => T;
+
 /** A type any class would have. As they all have a constructor.*/
-export type Class<T> = (abstract new (...args: unknown[]) => T) | (new (...args: unknown[]) => T);
+export type Class<T> = ConcreetClass<T> | AbstractClass<T>;
 
 /** The interface the constructor of a `Registry` expects. */
 export interface RegistryConstructorArguments {
@@ -116,26 +124,28 @@ export interface RegistryConstructorArguments {
 /** A class that has registry functions. */
 export type ClassAugmentedWithRegistry<C extends Class<object>> = C & {
   /** The internal registry. */
-  registry: Registry<C>;
+  registry: Registry<ConcreetClass<InstanceType<C>>>;
   /** Add a member from the internal registry using the default parameters. */
-  register: Registry<C>['register'];
+  register: Registry<ConcreetClass<InstanceType<C>>>['register'];
   /** Get a member from the internal registry by name. */
-  retrieve: Registry<C>['retrieve'];
+  retrieve: Registry<ConcreetClass<InstanceType<C>>>['retrieve'];
   /** Add a member to the internal registry. */
-  add: Registry<C>['add'];
+  add: Registry<ConcreetClass<InstanceType<C>>>['add'];
   /** Get the keys of all registered members. */
-  keys: Registry<C>['keys'];
+  keys: Registry<ConcreetClass<InstanceType<C>>>['keys'];
 };
 
 /** A class to register and retrieve classes by name. */
-export class Registry<T extends Class<object>> implements RequireAll<RegistryConstructorArguments> {
+export class Registry<T extends ConcreetClass<object>>
+  implements RequireAll<RegistryConstructorArguments>
+{
   /** Injects a registry instance and it's methods to a class. */
   // eslint-disable-next-line @typescript-eslint/naming-convention
   public static readonly inject = Object.assign(
     <C extends Class<object>>(cls: C): ClassAugmentedWithRegistry<C> =>
       Registry.injectHelper<C>(cls, { name: cls.name }),
     {
-      with:
+      using:
         (opts: Partial<RegistryConstructorArguments>) =>
         <C extends Class<object>>(cls: C): ClassAugmentedWithRegistry<C> =>
           Registry.injectHelper<C>(cls, {
@@ -146,7 +156,7 @@ export class Registry<T extends Class<object>> implements RequireAll<RegistryCon
   );
 
   /** The master Registry that holds all the registers. */
-  private static readonly MASTER: Record<string, Registry<Class<object>> | undefined> = {};
+  private static readonly MASTER: Record<string, Registry<ConcreetClass<object>> | undefined> = {};
 
   public readonly extensiveAliases: RequireAll<RegistryConstructorArguments>['extensiveAliases'];
   public readonly substrings: RequireAll<RegistryConstructorArguments>['substrings'];
@@ -155,15 +165,15 @@ export class Registry<T extends Class<object>> implements RequireAll<RegistryCon
   /**
    * Decorator that can be used in multiple ways:
    * - `@Class.register`: directly as decorator, uses class name to register.
-   * - `@Class.register.with({ name: "NewName" })`: allows you to override the name it will be registered as.
-   * - `@Class.register.with({ plugin: true })`: allows you to register it as a plugin or not.
-   * - `@Class.register.with({ aliases: ['alias1', 'alias2'] })`: called with custom aliases
+   * - `@Class.register.using({ name: "NewName" })`: allows you to override the name it will be registered as.
+   * - `@Class.register.using({ plugin: true })`: allows you to register it as a plugin or not.
+   * - `@Class.register.using({ aliases: ['alias1', 'alias2'] })`: called with custom aliases
    */
   public readonly register = Object.assign(<C extends T>(target: C): C => this.add<C>(target), {
-    with:
-      ({ aliases, name }: { readonly aliases?: readonly string[]; readonly name?: string }) =>
+    using:
+      (opts: Partial<Parameters<Registry<ConcreetClass<object>>['add']>[1]> = {}) =>
       <C extends T>(target: C): C =>
-        this.add<C>(target, { aliases, name }),
+        this.add<C>(target, opts),
   });
 
   /** The internal registry of a `Registry`. */
@@ -180,6 +190,15 @@ export class Registry<T extends Class<object>> implements RequireAll<RegistryCon
     this.name = name;
   }
 
+  /** Retrieves a `Registry` from the master registry. */
+  public static readonly retrieve = (
+    name: string
+  ):
+    | (DeepReadonly<Registry<ConcreetClass<object>>> & {
+        keys: Registry<ConcreetClass<object>>['keys'];
+      })
+    | undefined => Registry.MASTER[name];
+
   /** Injects a `Registry` into a given class, and returns the result. */
   private static injectHelper<C extends Class<object>>(
     cls: C,
@@ -188,14 +207,20 @@ export class Registry<T extends Class<object>> implements RequireAll<RegistryCon
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
     const augmented = cls as unknown as ClassAugmentedWithRegistry<C>;
     const name = opts.name ?? cls.name;
-    augmented.registry = new Registry<C>({ ...opts, name });
+    augmented.registry = new Registry<ConcreetClass<InstanceType<C>>>({ ...opts, name });
     augmented.retrieve = augmented.registry.retrieve;
     augmented.register = augmented.registry.register;
     augmented.keys = augmented.registry.keys;
     augmented.add = augmented.registry.add;
 
-    if (Registry.MASTER[name]) Logger.warn(`A 2nd Registry by name ${name} was created.`);
-    Registry.MASTER[name] = augmented.registry;
+    let variants = [name, `${name}s`] as readonly string[];
+    variants = createVariationsByRemovingSubstring(variants, opts.substrings ?? []);
+    variants = createVariations(variants, true);
+    for (const variant of new Set(variants)) {
+      if (['', 's', 'S'].includes(variant)) continue;
+      if (Registry.MASTER[variant]) Logger.warn(`A 2nd Registry by name ${variant} was created.`);
+      Registry.MASTER[variant] = augmented.registry;
+    }
 
     return augmented;
   }
@@ -215,8 +240,8 @@ export class Registry<T extends Class<object>> implements RequireAll<RegistryCon
     } = {}
   ): C => {
     let variants = [...aliases, name] as readonly string[];
-    variants = createVariations(variants, this.extensiveAliases);
     variants = createVariationsByRemovingSubstring(variants, this.substrings);
+    variants = createVariations(variants, this.extensiveAliases);
     variants = addXmlNameSpace(variants, plugin);
 
     // Register all the new keys in the registry
