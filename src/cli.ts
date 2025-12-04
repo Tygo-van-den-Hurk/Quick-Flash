@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as zod from 'zod';
-import { BasePath, type DeepReadonly, LogLevel, Logger } from '#lib';
+import { BasePath, type DeepReadonly, LogLevel, Logger, Registry } from '#lib';
 import { CompileArgs, compileFromCliArgs } from '#src/compile';
 import { ServeArgs, serve } from '#src/serve';
 import FastGlob from 'fast-glob';
@@ -201,6 +201,56 @@ export const cli = yargs(hideBin(process.argv))
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     async (args) => {
       await serve({ ...args, output: '' });
+    }
+  )
+
+  // List subcommand
+  .command(
+    'enumerate [registry]',
+    'List all registered keys in a given registry.',
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types,
+    (subYargs) =>
+      subYargs
+        .epilogue(EPILOGUE)
+
+        .option('yaml', {
+          alias: 'y',
+          description: 'Outputs the registered keys in that registry as YAML',
+          type: 'boolean',
+        })
+
+        .option('json', {
+          alias: 'j',
+          description: 'Outputs the registered keys in that registry as JSON',
+          type: 'boolean',
+        })
+
+        .conflicts('yaml', 'json')
+
+        .positional('registry', {
+          alias: 'input',
+          demandOption: true,
+          describe: 'The registry to print the keys',
+          type: 'string',
+        }),
+
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, prefer-arrow-callback
+    function callback(args): void {
+      const registry = Registry.retrieve(args.registry);
+      if (!registry) {
+        Logger.critical(`No such registry: ${args.registry}`);
+        return;
+      }
+
+      const keys = registry.keys();
+
+      let result; // eslint-disable-line @typescript-eslint/init-declarations
+      if ((args.yaml ?? false) && keys.length > 0) result = `- "${keys.join('"\n- "')}"`;
+      else if (args.json ?? false) result = JSON.stringify(keys);
+      else result = keys.join(' ');
+
+      // eslint-disable-next-line no-console
+      console.log(result);
     }
   )
 
