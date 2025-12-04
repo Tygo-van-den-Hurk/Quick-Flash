@@ -66,6 +66,7 @@ export const cli = yargs(hideBin(process.argv))
   .help('help', 'Show this help message, and then exit.', true)
   .alias('h', 'help')
   .epilogue(EPILOGUE)
+  .completion("completion", "Generate shell completion scripts.")
 
   .option('plugins', {
     alias: 'p',
