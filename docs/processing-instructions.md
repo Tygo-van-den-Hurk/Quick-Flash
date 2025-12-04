@@ -20,6 +20,8 @@ An example is the processing instructions to change the [markup renderer](markup
 
 Here follows a list off all possible instructions:
 
+- `markup`: change the active markup renderer
+
 ### Change Markup Renderer
 
 You can change the markup render to `XYZ` using:
