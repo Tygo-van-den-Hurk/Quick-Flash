@@ -1,4 +1,4 @@
-import { loadPlugins, parseInput, readInput } from '#lib/core/compiler/io';
+import { parseInput, readInput } from '#lib/core/compiler/io';
 import { Logger } from '#lib/logger';
 import path from 'path';
 import prettier from 'prettier'; // eslint-disable-line import/default
@@ -30,9 +30,6 @@ export const compile = async function compile(options: Readonly<CompileArgs>): P
 
   const parsed = parseInput(content);
   Logger.info(`Parsed input file.`);
-
-  await loadPlugins(options.plugins);
-  Logger.info(`Loaded ${options.plugins.length} plugins:`, options.plugins);
 
   const rendered = render(parsed);
   Logger.info(`Rendered file from input file.`);

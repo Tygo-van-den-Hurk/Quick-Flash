@@ -10,6 +10,7 @@ import { hideBin } from 'yargs/helpers';
 import path from 'path';
 import pkg from '#package' with { type: 'json' };
 import yargs from 'yargs';
+import { loadPlugins } from '#lib/core/compiler/io';
 
 // Helpers
 
@@ -122,6 +123,12 @@ export const cli = yargs(hideBin(process.argv))
     // Set the color value
     const disabled = 0;
     if (argv.color === 'never') chalk.level = disabled;
+  })
+
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, prefer-arrow-callback
+  .middleware(async function loadPluginsMiddleware(argv): Promise<void> {
+    await loadPlugins(argv.plugins);
+    Logger.info(`Loaded ${argv.plugins.length} plugins:`, argv.plugins);
   })
 
   // Compile subcommand
