@@ -1,6 +1,7 @@
 export * from '#lib/types/base-path';
 export * from '#lib/types/log-level';
 export * from '#lib/types/result';
+export * from '#lib/types/optional';
 
 /**
  * Forces all optional properties to not be optional.
