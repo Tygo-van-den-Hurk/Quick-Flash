@@ -7,10 +7,10 @@ import { ServeArgs, serve } from '#src/serve';
 import FastGlob from 'fast-glob';
 import chalk from 'chalk';
 import { hideBin } from 'yargs/helpers';
+import { loadPlugins } from '#lib/core/compiler/io';
 import path from 'path';
 import pkg from '#package' with { type: 'json' };
 import yargs from 'yargs';
-import { loadPlugins } from '#lib/core/compiler/io';
 
 // Helpers
 
@@ -67,7 +67,7 @@ export const cli = yargs(hideBin(process.argv))
   .help('help', 'Show this help message, and then exit.', true)
   .alias('h', 'help')
   .epilogue(EPILOGUE)
-  .completion("completion", "Generate shell completion scripts.")
+  .completion('completion', 'Generate shell completion scripts.')
 
   .option('plugins', {
     alias: 'p',
@@ -128,7 +128,11 @@ export const cli = yargs(hideBin(process.argv))
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, prefer-arrow-callback
   .middleware(async function loadPluginsMiddleware(argv): Promise<void> {
     await loadPlugins(argv.plugins);
-    Logger.info(`Loaded ${argv.plugins.length} plugins:`, argv.plugins);
+    Logger.info(`Loaded ${argv.plugins.length} plugins.`);
+    Logger.debug(
+      'Those loaded plugins being:',
+      argv.plugins.map((plugin) => chalk.gray(plugin)).join(', ')
+    );
   })
 
   // Compile subcommand
