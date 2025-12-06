@@ -4,10 +4,20 @@ import { Result } from '#lib/types/result';
 /** Returns the number if it is odd, else returns `null`. Used for tests. */
 const isOdd = function isOdd(num: number): number | null {
   if (num === 1) throw new Error();
-  if (num === 3) throw "3"; // eslint-disable-line @typescript-eslint/only-throw-error
+  if (num === 3) throw '3'; // eslint-disable-line @typescript-eslint/only-throw-error
   if (num === 5) throw 5; // eslint-disable-line @typescript-eslint/only-throw-error
   if (num % 2 === 1) return num;
   return null;
+};
+
+/** Waits a certain amount of milliseconds and then returns. */
+const wait = async function wait(ms: number): Promise<number> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (ms % 2 === 0) resolve(ms);
+      else reject(new Error());
+    }, ms);
+  });
 };
 
 describe('type Result', () => {
@@ -36,12 +46,12 @@ describe('type Result', () => {
       throw new Error('exit called');
     });
 
-    expect(() => Result.error(new Error).unwrap()).toThrow('exit called');
+    expect(() => Result.error(new Error()).unwrap()).toThrow('exit called');
     expect(exitSpy).toHaveBeenCalled();
     exitSpy.mockRestore();
   });
 
-  test('Result.exec', () => {
+  test('Result.exec (sync)', () => {
     // Returns `Result.ok<null>()`
     const result1 = Result.exec(isOdd, 0);
     expect(result1.type).toBe('ok');
@@ -60,7 +70,7 @@ describe('type Result', () => {
     expect(optional3.type).toBe('error');
     expect(optional3.isOk()).toBe(false);
     expect(optional3.isError()).toBe(true);
-   
+
     // Throws
     const optional4 = Result.exec(isOdd, 5);
     expect(optional4.type).toBe('error');
@@ -74,5 +84,20 @@ describe('type Result', () => {
     expect(optional5.isError()).toBe(false);
     expect(optional5.isOk()).toBe(true);
     expect(optional5.unwrap()).toBe(input);
+  });
+
+  test('Result.exec (async)', async () => {
+    // Throws
+    const result1 = await Result.exec(wait, 1);
+    expect(result1.type).toBe('error');
+    expect(result1.isOk()).toBe(false);
+    expect(result1.isError()).toBe(true);
+
+    // Returns `Result.ok<number>()`
+    const result2 = await Result.exec(wait, 2);
+    expect(result2.type).toBe('ok');
+    expect(result2.isError()).toBe(false);
+    expect(result2.isOk()).toBe(true);
+    expect(result2.unwrap()).toBe(2);
   });
 });

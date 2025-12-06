@@ -92,30 +92,58 @@ export namespace Result {
     };
   };
 
+  /** Creates a `Result` from an unknown thrown variable. */
+  export const fromThrown = function fromThrown<T>(exception: unknown): ErrorResult<T> {
+    if (exception instanceof Error) return error(exception);
+    if (typeof exception === 'string') return error(new Error(exception));
+    return error(new Error(`An unknown error occurred`));
+  };
+
+  /**
+   * Wraps execution of an asynchronous function, returning a `Promise<Result>` in all cases.
+   */
+  export function exec<P extends readonly unknown[], R>(
+    fn: (...params: P) => Promise<R>,
+    ...params: P
+  ): Promise<Result<R>>;
+
+  /**
+   * Wraps execution of a synchronous function, returning a `Result` in all cases.
+   */
+  export function exec<P extends readonly unknown[], R>(
+    fn: (...params: P) => R,
+    ...params: P
+  ): Result<R>;
+
   /**
    * Wraps execution of a function, returning a `Result` in all cases. Used for when you know a function can fail, but
    * have no control over it because for example it is imported from a library. If you do have control over the
    * function you can implement it returning a result as normal.
    */
-  export const exec = Object.defineProperty(
-    // eslint-disable-next-line prefer-arrow-callback
-    function exec<P extends readonly unknown[], R>(
-      fn: (...params: P) => R,
-      ...params: P
-    ): Result<R> {
-      try {
-        const result = fn(...params);
-        return ok(result);
-      } catch (exception) {
-        if (exception instanceof Error) return error(exception);
-        if (typeof exception === 'string') return error(new Error(exception));
-        return error(new Error(`An unknown error occurred`));
+  export function exec<P extends readonly unknown[], R>(
+    fn: (...params: P) => R | Promise<R>,
+    ...params: P
+  ): Result<R> | Promise<Result<R>> {
+    try {
+      const result = fn(...params);
+
+      if (result instanceof Promise) {
+        return result
+          .then((value: R) => ok<R>(value))
+          .catch((exception: unknown) => fromThrown<R>(exception));
       }
-    },
-    'name',
-    {
-      configurable: true,
-      value: 'Result.exec',
+
+      return ok(result);
+    } catch (exception) {
+      return fromThrown(exception);
     }
-  );
+  }
 }
+
+Object.defineProperty(Result.ok, 'name', { configurable: true, value: 'Result.ok' });
+Object.defineProperty(Result.error, 'name', { configurable: true, value: 'Result.error' });
+Object.defineProperty(Result.exec, 'name', { configurable: true, value: 'Result.exec' });
+Object.defineProperty(Result.fromThrown, 'name', {
+  configurable: true,
+  value: 'Result.fromThrown',
+});
