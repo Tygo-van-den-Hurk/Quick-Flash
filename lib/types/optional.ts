@@ -37,6 +37,8 @@ export interface NoneOptional<T extends NonNullable<unknown>> extends OptionalBa
   readonly type: 'none';
   readonly toResult: () => ErrorResult<T>;
   readonly unwrap: (() => never) & FallbackFunction<T>;
+  /** A possible exception that occurred and the reason for the missing data. */
+  readonly exception?: Readonly<Error>;
 }
 
 /** The interface of the `ok` result variant. */
@@ -77,62 +79,94 @@ export namespace Optional {
   };
 
   /** Creates an `error` result. */
-  export const none = Object.defineProperty(
-    // eslint-disable-next-line prefer-arrow-callback
-    function none<T extends NonNullable<unknown>>(): NoneOptional<T> {
-      return {
-        isNone: (): this is NoneOptional<T> => true,
-        isSome: (): this is SomeOptional<T> => false,
-        toResult: () => Result.error(new NoSuchElementError),
-        toString: () => `Optional.none()`,
-        type: 'none',
-        unwrap: Object.assign(
-          // eslint-disable-next-line no-restricted-syntax
-          (): never => {
-            Logger.critical(`Unwrap called on failed Optional without fallback.`);
-            const unixInternalSoftwareError = 70;
-            return process.exit(unixInternalSoftwareError);
+  export const none = function none<T extends NonNullable<unknown>>(
+    exception?: Readonly<Error>
+  ): NoneOptional<T> {
+    return {
+      exception,
+      isNone: (): this is NoneOptional<T> => true,
+      isSome: (): this is SomeOptional<T> => false,
+      toResult: () => Result.error(new NoSuchElementError()),
+      toString: () => `Optional.none()`,
+      type: 'none',
+      unwrap: Object.assign(
+        // eslint-disable-next-line no-restricted-syntax
+        (): never => {
+          Logger.critical(`Unwrap called on failed Optional without fallback.`);
+          const unixInternalSoftwareError = 70;
+          return process.exit(unixInternalSoftwareError);
+        },
+        {
+          withFallback: function withFallback(fallback: T): T {
+            return fallback;
           },
-          {
-            withFallback: function withFallback(fallback: T): T {
-              return fallback;
-            },
-          }
-        ),
-      };
-    },
-    'name',
-    {
-      configurable: true,
-      value: 'Optional.none',
-    }
-  );
+        }
+      ),
+    };
+  };
+
+  /** Creates a `Optional` from an unknown thrown variable. */
+  export const fromThrown = function fromThrown<T extends NonNullable<unknown>>(
+    exception: unknown
+  ): NoneOptional<T> {
+    if (exception instanceof Error) return none<T>(exception);
+    if (typeof exception === 'string') return none<T>(new Error(exception));
+    return none<T>(new Error(`An unknown error occurred`));
+  };
+
+  /** Creates an optional for a value that might be `null` or `undefined`. */
+  export const from = function from<T>(value: T): Optional<NonNullable<T>> {
+    // eslint-disable-next-line no-undefined
+    if (value !== undefined && value !== null) return some(value);
+    return none();
+  };
+
+  /**
+   * Wraps execution of an asynchronous function, returning a `Promise<Optional>` in all cases.
+   */
+  export function exec<P extends readonly unknown[], R>(
+    fn: (...params: P) => Promise<R>,
+    ...params: P
+  ): Promise<Optional<NonNullable<R>>>;
+
+  /**
+   * Wraps execution of a synchronous function, returning a `Optional` in all cases.
+   */
+  export function exec<P extends readonly unknown[], R>(
+    fn: (...params: P) => R,
+    ...params: P
+  ): Optional<NonNullable<R>>;
 
   /**
    * Wraps execution of a function, returning a `Optional` in all cases. Used for when you know a function can fail,
    * but have no control over it because for example it is imported from a library. If you do have control over the
    * function you can implement it returning an `Optional` as normal.
    */
-  export const exec = Object.defineProperty(
-    // eslint-disable-next-line prefer-arrow-callback
-    function exec<P extends readonly unknown[], R>(
-      fn: (...params: P) => R,
-      ...params: P
-    ): Optional<R & {}> {
-      try {
-        const result = fn(...params);
-        // eslint-disable-next-line no-undefined
-        if (result !== undefined && result !== null) return some(result);
-        return none();
-      } catch (error) {
-        Logger.error(error);
-        return none();
+  export function exec<P extends readonly unknown[], R>(
+    fn: (...params: P) => R | Promise<R>,
+    ...params: P
+  ): Optional<NonNullable<R>> | Promise<Optional<NonNullable<R>>> {
+    try {
+      const result = fn(...params);
+
+      if (result instanceof Promise) {
+        return result
+          .then((value: R) => from(value))
+          .catch((exception: unknown) => fromThrown(exception));
       }
-    },
-    'name',
-    {
-      configurable: true,
-      value: 'Optional.exec',
+
+      return from(result);
+    } catch (exception) {
+      return fromThrown(exception);
     }
-  );
+  }
 }
+
+Object.defineProperty(Optional.some, 'name', { configurable: true, value: 'Optional.some' });
+Object.defineProperty(Optional.none, 'name', { configurable: true, value: 'Optional.none' });
+Object.defineProperty(Optional.from, 'name', { configurable: true, value: 'Optional.from' });
+Object.defineProperty(Optional.exec, 'name', { configurable: true, value: 'Optional.exec' });
+Object.defineProperty(Optional.fromThrown, 'name', {
+  configurable: true,
+  value: 'Optional.fromThrown',
+});

@@ -1,11 +1,27 @@
+import { type NoneOptional, Optional } from '#lib/types/optional';
 import { describe, expect, test, vi } from 'vitest';
-import { Optional } from '#lib/types/optional';
 
 /** Returns the number if it is odd, else returns `null`. Used for tests. */
 const isOdd = function isOdd(num: number): number | null {
+  if (num % 2 === 0) return null;
   if (num === 1) throw new Error();
-  if (num % 2 === 1) return num;
-  return null;
+  if (num === 3) throw '3'; // eslint-disable-line @typescript-eslint/only-throw-error
+  if (num === 5) throw 5; // eslint-disable-line @typescript-eslint/only-throw-error
+  return num;
+};
+
+/** Waits a certain amount of milliseconds and then returns. */
+const wait = async function wait(ms: number): Promise<ReturnType<typeof isOdd>> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        const result = isOdd(ms);
+        resolve(result);
+      } catch (error) {
+        reject(error); // eslint-disable-line @typescript-eslint/prefer-promise-reject-errors
+      }
+    }, ms);
+  });
 };
 
 describe('type Optional', () => {
@@ -44,22 +60,62 @@ describe('type Optional', () => {
     exitSpy.mockRestore();
   });
 
-  test('Optional.exec', () => {
-    // Returns `Optional.none<number>()`
+  test('Optional.exec (sync)', () => {
+    // Returns `Optional.none<number>()` because result is null
     const optional1 = Optional.exec(isOdd, 0);
     expect(optional1.type).toBe('none');
     expect(optional1.isSome()).toBe(false);
     expect(optional1.isNone()).toBe(true);
+    expect((optional1 as NoneOptional<number>).exception).not.toBeDefined();
 
-    // Throws
+    // Returns `Optional.none<number>()` because of throw
     const optional2 = Optional.exec(isOdd, 1);
     expect(optional2.type).toBe('none');
     expect(optional2.isSome()).toBe(false);
     expect(optional2.isNone()).toBe(true);
+    expect((optional2 as NoneOptional<number>).exception).toBeDefined();
+
+    // Returns `Optional.none<number>()` because of throw
+    const optional3 = Optional.exec(isOdd, 3);
+    expect(optional3.type).toBe('none');
+    expect(optional3.isSome()).toBe(false);
+    expect(optional3.isNone()).toBe(true);
+    expect((optional3 as NoneOptional<number>).exception).toBeDefined();
+
+    // Returns `Optional.none<number>()` because of throw
+    const optional4 = Optional.exec(isOdd, 5);
+    expect(optional4.type).toBe('none');
+    expect(optional4.isSome()).toBe(false);
+    expect(optional4.isNone()).toBe(true);
+    expect((optional4 as NoneOptional<number>).exception).toBeDefined();
 
     // Returns `Optional.some<number>()`
-    const input = 3;
-    const optional3 = Optional.exec(isOdd, input);
+    const input = 7;
+    const optional5 = Optional.exec(isOdd, input);
+    expect(optional5.type).toBe('some');
+    expect(optional5.isSome()).toBe(true);
+    expect(optional5.isNone()).toBe(false);
+    expect(optional5.unwrap()).toBe(input);
+  });
+
+  test('Optional.exec (async)', async () => {
+    // Returns `Optional.none<number>()` because of throw
+    const optional1 = await Optional.exec(wait, 1);
+    expect(optional1.type).toBe('none');
+    expect(optional1.isSome()).toBe(false);
+    expect(optional1.isNone()).toBe(true);
+    expect((optional1 as NoneOptional<number>).exception).toBeDefined();
+
+    // Returns `Optional.none<number>()`
+    const optional2 = await Optional.exec(wait, 2);
+    expect(optional2.type).toBe('none');
+    expect(optional2.isSome()).toBe(false);
+    expect(optional2.isNone()).toBe(true);
+    expect((optional2 as NoneOptional<number>).exception).not.toBeDefined();
+
+    // Returns `Optional.some<number>()`
+    const input = 7;
+    const optional3 = await Optional.exec(wait, input);
     expect(optional3.type).toBe('some');
     expect(optional3.isSome()).toBe(true);
     expect(optional3.isNone()).toBe(false);
