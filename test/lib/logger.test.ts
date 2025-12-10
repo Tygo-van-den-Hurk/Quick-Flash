@@ -9,6 +9,7 @@ describe('class Logger', () => {
   beforeAll(() => {
     Logger.logLevel = Logger.DEFAULT_LOG_LEVEL;
     Logger.DEFAULT_FUNCTIONS = {
+      [LogLevel.TRACE]: spy,
       [LogLevel.DEBUG]: spy,
       [LogLevel.INFO]: spy,
       [LogLevel.WARN]: spy,
@@ -40,13 +41,15 @@ describe('class Logger', () => {
   });
 
   test('if Logger.logLevel is less verbose then function print nothing', () => {
-    Logger.logLevel = LogLevel.DEBUG;
+    // Most verbose `LogLevel`:
+    Logger.logLevel = LogLevel.options[0] as LogLevel;
     for (const level of LogLevel.options) {
       expect(Logger.DEFAULT_FUNCTIONS[level]).not.toBe(Logger.DEV_NULL);
       expect(Logger.functions[level]).not.toBe(Logger.DEV_NULL);
     }
 
-    Logger.logLevel = LogLevel.SILENT;
+    // Least verbose `LogLevel`:
+    Logger.logLevel = LogLevel.options[LogLevel.options.length - 1];
     for (const level of LogLevel.options) {
       if (LogLevel.of(level).isLessOrAsVerboseAs(Logger.logLevel)) continue;
       expect(Logger.DEFAULT_FUNCTIONS[level]).not.toBe(Logger.DEV_NULL);

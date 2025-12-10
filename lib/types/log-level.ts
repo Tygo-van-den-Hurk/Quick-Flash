@@ -1,6 +1,6 @@
 import * as zod from 'zod';
 
-const OPTIONS = ['debug', 'info', 'warn', 'error', 'critical', 'silent'] as const;
+const OPTIONS = ['trace', 'debug', 'info', 'warn', 'error', 'critical', 'silent'] as const;
 
 const PARSER = zod.enum(OPTIONS);
 
@@ -62,6 +62,11 @@ export namespace LogLevel {
    * An array of all possible `LogLevel` options.
    */
   export const options = OPTIONS;
+
+  /**
+   * The `trace` log-level.
+   */
+  export const TRACE = 'trace' as const;
 
   /**
    * The `debug` log-level.

@@ -11,6 +11,7 @@ describe('enum LogLevel', () => {
   test('LogLevel.options', () => {
     expect([...LogLevel.options].sort()).toStrictEqual(
       [
+        LogLevel.TRACE,
         LogLevel.DEBUG,
         LogLevel.INFO,
         LogLevel.WARN,

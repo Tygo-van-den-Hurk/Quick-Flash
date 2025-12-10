@@ -15,35 +15,42 @@ interface LogApi {
    * the first used as the primary message and all additional used as substitution values similar to printf (the
    * arguments are all passed to `util.format()`).
    */
-  critical: LogFunction;
+  readonly critical: LogFunction;
 
   /**
    * Prints to `stderr` with newline if `Logger.logLevel <= LogLevel.ERROR`. Multiple arguments can be passed, with
    * the first used as the primary message and all additional used as substitution values similar to printf (the
    * arguments are all passed to `util.format()`).
    */
-  error: LogFunction;
+  readonly error: LogFunction;
 
   /**
    * Prints to `stderr` with newline if `Logger.logLevel <= LogLevel.WARN`. Multiple arguments can be passed, with
    * the first used as the primary message and all additional used as substitution values similar to printf (the
    * arguments are all passed to `util.format()`).
    */
-  warn: LogFunction;
+  readonly warn: LogFunction;
 
   /**
    * Prints to `stdout` with newline if `Logger.logLevel <= LogLevel.INFO`. Multiple arguments can be passed, with
    * the first used as the primary message and all additional used as substitution values similar to printf (the
    * arguments are all passed to `util.format()`).
    */
-  info: LogFunction;
+  readonly info: LogFunction;
 
   /**
    * Prints to `stdout` with newline if `Logger.logLevel <= LogLevel.INFO`. Multiple arguments can be passed, with
    * the first used as the primary message and all additional used as substitution values similar to printf (the
    * arguments are all passed to `util.format()`).
    */
-  debug: LogFunction;
+  readonly debug: LogFunction;
+
+  /**
+   * Prints to `stdout` with newline if `Logger.logLevel <= LogLevel.TRACE`. Multiple arguments can be passed, with
+   * the first used as the primary message and all additional used as substitution values similar to printf (the
+   * arguments are all passed to `util.format()`).
+   */
+  readonly trace: LogFunction;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
@@ -82,6 +89,7 @@ export class Logger {
     [LogLevel.WARN]: STD_ERR,
     [LogLevel.INFO]: STD_OUT,
     [LogLevel.DEBUG]: STD_OUT,
+    [LogLevel.TRACE]: STD_OUT,
   };
 
   /**
@@ -223,6 +231,22 @@ export class Logger {
   };
 
   /**
+   * Prints to `stdout` with newline if `Logger.logLevel <= LogLevel.TRACE`. Multiple arguments can be passed, with
+   * the first used as the primary message and all additional used as substitution values similar to printf (the
+   * arguments are all passed to `util.format()`).
+   */
+  public static readonly trace: LogFunction = function trace(
+    message?: any,
+    ...optionalParams: any[]
+  ): void {
+    Logger.functions[LogLevel.TRACE](
+      `${chalk.bold.gray(LogLevel.TRACE.toUpperCase())}:`,
+      message,
+      ...optionalParams
+    );
+  };
+
+  /**
    * The API of the logger. Can be safely given to plugins or any arbitrary code without them being able to change
    * the log level.
    */
@@ -239,6 +263,9 @@ export class Logger {
     },
     info: (...args: unknown[]) => {
       Logger.info(args);
+    },
+    trace: (...args: unknown[]) => {
+      Logger.trace(...args);
     },
     warn: (...args: unknown[]) => {
       Logger.warn(args);
