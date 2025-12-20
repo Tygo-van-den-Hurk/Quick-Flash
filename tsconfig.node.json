@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+  },
+  "include": [
+    "src/**/*.ts",
+    "lib/**/*.ts",
+    "test/**/*.ts",
+  ],
+  "exclude": [
+    "src/**/*.browser.ts",
+    "lib/**/*.browser.ts",
+    "test/**/*.browser.ts",
+    "test/**/*.browser.test.ts",
+  ],
+}

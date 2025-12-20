@@ -117,10 +117,13 @@ export default defineConfig(
       ],
     },
   },
+  //
+  // Making tests files use less strict linting
+  //
   {
     // Since test functions are not for production, we can use unsafe things,
     // if they fail that is even better.
-    files: ['**/*.test.ts', '**/*.spec.ts'],
+    files: ['test/**/*.ts'],
     rules: {
       'no-restricted-syntax': 'off',
       'max-lines-per-function': 'off',
@@ -134,5 +137,42 @@ export default defineConfig(
       "no-plusplus": "off"
     },
   },
+  //
+  // SELECT THE RIGHT TS CONFIG FOR THE RIGHT ENVIRONMENT
+  //
+  {
+    files: [
+      'src/**/*.ts',
+      'lib/**/*.ts',
+      'test/**/*.ts',
+    ],
+    ignores: [
+      'src/**/*.browser.ts',
+      'lib/**/*.browser.ts',
+      'test/**/*.browser.ts',
+      'test/**/*.browser.test.ts',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.node.json',
+      },
+    },
+  },
+  {
+    files: [
+      'src/**/*.browser.ts',
+      'lib/**/*.browser.ts',
+      'test/**/*.browser.ts',
+      'test/**/*.browser.test.ts',
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: './tsconfig.web.json',
+      },
+    },
+  },
+  //
+  // FORMATTING
+  //
   prettier,
 );
