@@ -6,10 +6,10 @@ import { LogLevel } from '#lib/types/log-level';
 import chalk from 'chalk';
 
 /** The exact type of `console.xyz()`. */
-type LogFunction = typeof console.info;
+type LogFunction = typeof console.log;
 
 /** The interface that any logger needs to implement */
-interface LogApi {
+export interface LogApi {
   /**
    * Prints to `stderr` with newline if `Logger.logLevel <= LogLevel.CRITICAL`. Multiple arguments can be passed, with
    * the first used as the primary message and all additional used as substitution values similar to printf (the
@@ -56,12 +56,6 @@ interface LogApi {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 const DEV_NULL: LogFunction = (_message, ..._optionalParams) => {};
 
-// eslint-disable-next-line no-console
-const STD_OUT: LogFunction = console.info;
-
-// eslint-disable-next-line no-console
-const STD_ERR: LogFunction = console.error;
-
 /**
  * The logger of the application. Has functions for all `LogLevel`s like `Logger.debug(...)`.
  */
@@ -73,23 +67,17 @@ export class Logger {
   /** A function that ignores all it's arguments. */
   public static readonly DEV_NULL: LogFunction = DEV_NULL;
 
-  /** A function that prints as `console.log` to STD out. */
-  public static readonly STD_OUT: LogFunction = STD_OUT;
-
-  /** A function that prints as `console.log` to STD err. */
-  public static readonly STD_ERR: LogFunction = STD_ERR;
-
   /**
    * The default function for each `LogLevel`.
    */
   private static PRIVATE_DEFAULT_FUNCTIONS: Record<LogLevel, LogFunction> = {
     [LogLevel.SILENT]: DEV_NULL,
-    [LogLevel.CRITICAL]: STD_ERR,
-    [LogLevel.ERROR]: STD_ERR,
-    [LogLevel.WARN]: STD_ERR,
-    [LogLevel.INFO]: STD_OUT,
-    [LogLevel.DEBUG]: STD_OUT,
-    [LogLevel.TRACE]: STD_OUT,
+    [LogLevel.CRITICAL]: console.error, // eslint-disable-line no-console
+    [LogLevel.ERROR]: console.error, // eslint-disable-line no-console
+    [LogLevel.WARN]: console.warn, // eslint-disable-line no-console
+    [LogLevel.INFO]: console.info, // eslint-disable-line no-console
+    [LogLevel.DEBUG]: console.debug, // eslint-disable-line no-console
+    [LogLevel.TRACE]: console.trace, // eslint-disable-line no-console
   };
 
   /**
@@ -143,8 +131,7 @@ export class Logger {
     const STEP = 1;
     for (let index = 0; index < LogLevel.options.length; index += STEP) {
       const level = LogLevel.fromNumber(index);
-      if (LogLevel.of(level).isMoreVerboseThen(newLevel))
-        Logger.privateFunctions[level] = Logger.DEV_NULL;
+      if (LogLevel.of(level).isMoreVerboseThen(newLevel)) Logger.privateFunctions[level] = DEV_NULL;
       else Logger.privateFunctions[level] = Logger.DEFAULT_FUNCTIONS[level];
     }
   }
@@ -251,7 +238,7 @@ export class Logger {
    * the log level.
    */
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  public static readonly API: LogApi = {
+  public static readonly API: LogApi = Object.freeze({
     critical: (...args: unknown[]) => {
       Logger.critical(args);
     },
@@ -270,7 +257,7 @@ export class Logger {
     warn: (...args: unknown[]) => {
       Logger.warn(args);
     },
-  };
+  });
 }
 
 Logger.logLevel = Logger.DEFAULT_LOG_LEVEL;
