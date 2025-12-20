@@ -1,0 +1,72 @@
+name: Basic CI tests
+# These tests run whenever source code changes. It checks whether the
+# code is formatted, linted, passes tests, and can be built.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master, release, development]
+    paths: [test/**, lib/**, src/**, package*, tsconfig*, vitest*, eslint*, prettier* ]
+  pull_request:
+    branches: [main, master, release, development]
+    types: [opened, synchronize, reopened]
+    paths: [test/**, lib/**, src/**, package*, tsconfig*, vitest*, eslint*, prettier* ]
+
+jobs:
+  basic-ci-matrix:
+    name: checking "npm run ${{ matrix.task }}" on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.1
+      - name: Set up Node.js
+        uses: actions/setup-node@v6.1.0
+        with:
+          node-version: 24
+          cache-dependency-path: package-lock.json
+          cache: 'npm'
+      - name: Restore npm cache
+        uses: actions/cache@v5.0.1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-24-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-24-
+      - name: Install all dependencies
+        run: npm ci
+      - name: Run task (npm run ${{ matrix.task }})
+        run: npm run ${{ matrix.task }}
+      - name: Basic Functionality
+        if: ${{ matrix.task == 'build' }}
+        run: npm run start -- --help
+      - name: Upload build artifacts
+        if: ${{ matrix.task == 'build' }}
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          retention-days: 7
+          name: dist-${{ github.sha }}-${{ matrix.os }}
+          path: dist
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # Linux-only tasks
+          - os: ubuntu-latest
+            task: "lint:check"
+          - os: ubuntu-latest
+            task: "format:check"
+          # Build on all OSes
+          - os: ubuntu-latest
+            task: build
+          - os: windows-latest
+            task: build
+          - os: macos-latest
+            task: build
+          # Tests on all OSes
+          - os: ubuntu-latest
+            task: test
+          - os: windows-latest
+            task: test
+          - os: macos-latest
+            task: test
