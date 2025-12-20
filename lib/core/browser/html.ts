@@ -41,6 +41,7 @@ export const htmlDocument = function htmlDocument(args: SlydeHtmlDocumentHtmlPro
         ${baseTailwind()}
         <title>${args.title}</title>
         <!-- TODO: wget this script and then inject it as a string instead. -->
+        <script> const Logger = Object.freeze({ ...console, critical: console.error }); </script>
         <script src="https://cdn.tailwindcss.com"></script>
         <script id="tailwind-config-setup"> tailwind.config = ${JSON.stringify(tailwindConfig({ ...args }))}; </script>
         <script id="event-listening-setup" type="module">${setupScriptCode}</script>

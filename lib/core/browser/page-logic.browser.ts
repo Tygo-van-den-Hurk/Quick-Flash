@@ -1,7 +1,5 @@
-/* eslint-disable no-console */
-// I will remove this later when the logger is also in the web console.
-
 import type { DeepReadonly } from '#lib/types';
+import { Logger } from '#lib/logger';
 
 let hideTimeout: NodeJS.Timeout | undefined; // eslint-disable-line @typescript-eslint/init-declarations
 
@@ -78,7 +76,7 @@ export function getCurrentSlideUrlHash({
 export const goToNextSlide = function goToNextSlide(): void {
   const currentSlide = getCurrentSlideUrlHash();
   const nextSlide = currentSlide + 1;
-  console.log(`Going to the next slide: ${nextSlide}`);
+  Logger.info(`Going to the next slide: ${nextSlide}`);
   setCurrentSlideUrlHash(nextSlide);
 };
 
@@ -88,11 +86,11 @@ export const goToPreviousSlide = function goToPreviousSlide(): void {
   const previousSlide = currentSlide - 1;
 
   if (previousSlide < 1) {
-    console.log(`At the start of the presentation, cannot go back further.`);
+    Logger.warn(`At the start of the presentation, cannot go back further.`);
     return;
   }
 
-  console.log(`Going to the previous slide: ${previousSlide}`);
+  Logger.info(`Going to the previous slide: ${previousSlide}`);
   setCurrentSlideUrlHash(previousSlide);
 };
 
@@ -117,12 +115,12 @@ export const handleUrlHashChange = function handleUrlHashChange(
   if (!match?.groups) {
     let message = `The new URL hash: ${newURL.hash} does not have a hash of the right shape: ${regex}.`;
     message += `Resetting it to the old value of ${oldUrl.hash}`;
-    console.warn(message);
+    Logger.warn(message);
     history.replaceState(null, '', event.oldURL);
     return;
   }
 
-  console.log(`Moved to: ${event.newURL}`);
+  Logger.info(`Moved to: ${event.newURL}`);
 };
 
 /** Handles mouse presses on the document, and moves slides accordingly. */
