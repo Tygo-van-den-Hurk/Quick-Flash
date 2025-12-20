@@ -6,6 +6,7 @@ import {
   baseTailwind,
   tailwindConfig,
 } from '#lib/core/browser/css';
+import { setupScriptCode } from '#lib/core/browser/page-logic.browser';
 
 /** The properties a  */
 export interface SlydeHtmlDocumentHtmlProperties extends SlydeHtmlDocumentCssProperties {
@@ -36,13 +37,13 @@ export const htmlDocument = function htmlDocument(args: SlydeHtmlDocumentHtmlPro
     <!DOCTYPE html>
     <html lang="en">
       <head>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
-        <!-- TODO: wget this script and then inject it as a string instead. -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script> tailwind.config = ${JSON.stringify(tailwindConfig({ ...args }))}; </script>
         <style> ${baseCSS({ ...args })} </style>
         ${baseTailwind()}
         <title>${args.title}</title>
+        <!-- TODO: wget this script and then inject it as a string instead. -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script id="tailwind-config-setup"> tailwind.config = ${JSON.stringify(tailwindConfig({ ...args }))}; </script>
+        <script id="event-listening-setup" type="module">${setupScriptCode}</script>
         <meta charset="UTF-8">
         <meta name="darkreader-lock">
         <meta property="og:title" content="${args.title}">
@@ -57,7 +58,7 @@ export const htmlDocument = function htmlDocument(args: SlydeHtmlDocumentHtmlPro
         <meta name="theme-color" content="${args.primary}" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
         <link rel="icon" href="${args.icon}">
-        <link rel="apple-touch-icon" href="${args.icon}">        
+        <link rel="apple-touch-icon" href="${args.icon}">    
       </head>
       <body>
         ${args.content}
