@@ -138,40 +138,6 @@ export default defineConfig(
     },
   },
   //
-  // SELECT THE RIGHT TS CONFIG FOR THE RIGHT ENVIRONMENT
-  //
-  {
-    files: [
-      'src/**/*.ts',
-      'lib/**/*.ts',
-      'test/**/*.ts',
-    ],
-    ignores: [
-      'src/**/*.browser.ts',
-      'lib/**/*.browser.ts',
-      'test/**/*.browser.ts',
-      'test/**/*.browser.test.ts',
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: './tsconfig.node.json',
-      },
-    },
-  },
-  {
-    files: [
-      'src/**/*.browser.ts',
-      'lib/**/*.browser.ts',
-      'test/**/*.browser.ts',
-      'test/**/*.browser.test.ts',
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: './tsconfig.web.json',
-      },
-    },
-  },
-  //
   // FORMATTING
   //
   prettier,
