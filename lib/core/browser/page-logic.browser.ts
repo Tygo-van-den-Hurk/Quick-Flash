@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+// I will remove this later when the logger is also in the web console.
 
 import type { DeepReadonly } from '#lib/types';
 
@@ -6,15 +7,15 @@ let hideTimeout: NodeJS.Timeout | undefined; // eslint-disable-line @typescript-
 
 /** Hides mouse cursor when its not moving, shows the mouse cursor when it is. */
 export const handleMouseMove = function handleMouseMove(): void {
-  document.documentElement.style.cursor = "default";
-  
+  document.documentElement.style.cursor = 'default';
+
   clearTimeout(hideTimeout);
-  
+
   const second = 1000;
   hideTimeout = setTimeout(() => {
     document.documentElement.style.cursor = 'none';
   }, second);
-}
+};
 
 /**
  * The Regex the Hash will comply with.
@@ -165,7 +166,7 @@ export const handleScrollEvents = function handleScrollEvents(event: WheelEvent)
 };
 
 /**
- * Handles touch events the screen. Goes to the next slide, when tapping the right half, 
+ * Handles touch events the screen. Goes to the next slide, when tapping the right half,
  * and the previous slide when tapping the left half of the screen.
  */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -173,17 +174,16 @@ export const handleTouchEvents = function handleTouchEvents(event: TouchEvent): 
   const half = 2;
   const screenWidth = window.innerWidth;
   for (const touch of event.touches) {
-    
     // Ignoring touches outside of the presentation, or are not on document nodes.
     const { target } = touch;
     if (!(target instanceof Node)) continue;
     if (!document.body.contains(target)) continue;
     if (target === document.documentElement) continue;
-    
+
     if (touch.clientX > screenWidth / half) goToNextSlide();
     else goToPreviousSlide();
   }
-}
+};
 
 /** Prevents context menus from showing up when right clicking. */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -202,7 +202,7 @@ export const addEventListeners = function addEventListeners(): void {
   window.addEventListener('mousedown', handleMousePresses);
   window.addEventListener('wheel', handleScrollEvents);
   window.addEventListener('mousemove', handleMouseMove);
-  window.addEventListener("touchstart", handleTouchEvents);
+  window.addEventListener('touchstart', handleTouchEvents);
 };
 
 /** The full setup code to run when first opening the document */
