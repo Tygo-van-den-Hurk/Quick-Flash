@@ -1,0 +1,9 @@
+node_modules
+dist
+ignore
+docs
+coverage
+.github
+.git*
+.cache
+.tsbuildinfo

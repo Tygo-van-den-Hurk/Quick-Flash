@@ -1,0 +1,79 @@
+name: Build container image
+# On pushes to the main branches, build and push the newly created docker
+# images to the GitHub Container Repository where people can pull them from.
+
+on:
+  push:
+    tags: [v*.*.*]
+    branches: [main, master, release, development]
+    paths: 
+      - test/**
+      - lib/**
+      - src/**
+      - '*package*'
+      - '*tsconfig*'
+      - '*vitest*'
+      - '*eslint*'
+      - '*prettier*'
+      - '*[Dd]ocker*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    name: build and push container image
+    runs-on: ubuntu-latest
+    env:
+      PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.event.repository.name }}
+      USER: ${{ github.actor }}
+      TARGET: production
+      SERVER: ghcr.io
+    steps:
+      - name: Make lower case image environment variable
+        run: |
+          # images need to be lower case
+          full="$SERVER/$USER/$REPO"
+          echo "IMAGE=${full,,}" >> $GITHUB_ENV
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.1
+        with: { fetch-depth: 0 }
+      - name: Log in to GitHub Container Repository
+        run: docker login "$SERVER" --username "$USER" --password "$PASSWORD"
+      - name: Get image tags
+        id: vars
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            FULL_TAG="${GITHUB_REF#refs/tags/}"   # Remove refs/tags/
+            echo "full_tag=$FULL_TAG" >> $GITHUB_OUTPUT
+            # Remove leading 'v' if present
+            VERSION="${FULL_TAG#v}"
+            # Remove pre-release or build metadata (anything after '-')
+            VERSION="${VERSION%%-*}"
+            # Split version like "1.2.3" into "1.2.3", "1.2", "1"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+            echo "tags=$FULL_TAG,$MAJOR.$MINOR,$MAJOR" >> $GITHUB_OUTPUT
+          else
+            echo "full_tag=latest" >> $GITHUB_OUTPUT
+            echo "tags=latest" >> $GITHUB_OUTPUT
+          fi
+      - name: Build docker image
+        run: |
+          tag="$IMAGE:${{ steps.vars.outputs.full_tag }}"
+          docker build --target "$TARGET" --tag "$tag" .
+      - name: Basic container runtime test
+        run: docker run --rm "$IMAGE:${{ steps.vars.outputs.full_tag }}" -- --help
+      - name: Tag docker image with multiple tags
+        run: |
+          for tag in $(echo "${{ steps.vars.outputs.tags }}" | tr ',' ' '); do
+            image="$IMAGE:${{ steps.vars.outputs.full_tag }}"
+            alias="$IMAGE:$tag"
+            docker tag "$image" "$alias"
+          done
+      - name: Push created image to registry
+        run: |
+          for tag in $(echo "${{ steps.vars.outputs.tags }}" | tr ',' ' '); do
+            docker push "$IMAGE:$tag"
+          done 
