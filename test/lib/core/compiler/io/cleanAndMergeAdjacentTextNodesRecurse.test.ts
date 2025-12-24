@@ -1,5 +1,5 @@
-import type { XmlParserElementNode, XmlParserResult } from 'xml-parser-xo';
 import { describe, expect, test } from 'vitest';
+import type { XmlParserElementNode } from 'xml-parser-xo';
 import { cleanAndMergeAdjacentTextNodesRecurse } from '#lib/core/compiler/io';
 
 describe('function cleanAndMergeAdjacentTextNodesRecurse', () => {
