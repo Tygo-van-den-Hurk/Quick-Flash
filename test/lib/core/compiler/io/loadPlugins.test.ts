@@ -4,9 +4,7 @@ import { pathToFileURL } from 'node:url';
 
 const pluginFile = '#test-plugin.js';
 
-const resolvedPath = pathToFileURL(
-  path.resolve(pluginFile)
-).href;
+const resolvedPath = pathToFileURL(path.resolve(pluginFile)).href;
 
 vi.doMock(resolvedPath, () => ({
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types, @typescript-eslint/no-explicit-any
@@ -16,7 +14,7 @@ vi.doMock(resolvedPath, () => ({
       class MyComponent extends Component {
         // eslint-disable-next-line @typescript-eslint/class-methods-use-this
         public render(): string {
-          return "<html>...</html>";
+          return '<html>...</html>';
         }
       }
     ),

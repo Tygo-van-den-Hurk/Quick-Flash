@@ -136,9 +136,9 @@ export type ClassAugmentedWithRegistry<C extends Class<object>> = C & {
 };
 
 /** A class to register and retrieve classes by name. */
-export class Registry<
-  T extends ConcreetClass<object>,
-> implements RequireAll<RegistryConstructorArguments> {
+export class Registry<T extends ConcreetClass<object>>
+  implements RequireAll<RegistryConstructorArguments>
+{
   /** Injects a registry instance and it's methods to a class. */
   // eslint-disable-next-line @typescript-eslint/naming-convention
   public static readonly inject = Object.assign(
