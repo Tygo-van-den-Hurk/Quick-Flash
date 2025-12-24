@@ -42,10 +42,12 @@ Slyde' markup was designed to be as simple as possible, and to be as consistent 
 
 There is support out of the box for replacing the default markup renderer implementation with any of your choice using plugins. The following Markup renders are installed by default, and can be used without any plugins:
 
-- [`Slyde`](#slyde-markup) (default)
-- [`Markdown`](https://en.wikipedia.org/wiki/Markdown)
-- [`Latex`](https://en.wikipedia.org/wiki/LaTeX) (math mode only)
-- [`Plain`](#switching-it-off) (Aliased under `Raw` and `Off`)
+- [`Slyde`](#slyde-markup): Renders the text using Slyde' own markup language. (default)
+- [`Markdown`](https://en.wikipedia.org/wiki/Markdown): Renders markdown as you know it.
+- [`Latex`](https://en.wikipedia.org/wiki/LaTeX): Renders the text as latex in math mode. (math mode only)
+- [`Plain`](#switching-it-off): Renders the text as is. (Aliased under `Raw` and `Off`)
+- [`UpperCase`](https://en.wikipedia.org/wiki/Letter_case): Renders the text as uppercase.
+- [`LowerCase`](https://en.wikipedia.org/wiki/Letter_case): Renders the text as lowercase.
 
 To select the a different markup renderer for example Markdown, change the markup key:
 
