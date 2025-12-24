@@ -40,9 +40,11 @@
         "lint": "npm run --silent lint:check --",
         "lint:check": "eslint '{src,lib,test}/**/*.{js,ts}' --cache --cache-location ./.cache/eslint/",
         "lint:write": "eslint '{src,lib,test}/**/*.{js,ts}' --cache --cache-location ./.cache/eslint/ --fix",
+        "lint:fix": "npm run --silent lint:write --",
         "format": "npm run --silent format:write --",
         "format:check": "prettier '{src,lib,test}/**/*.{js,ts}' --check",
-        "format:write": "prettier '{src,lib,test}/**/*.{js,ts}' --write"
+        "format:write": "prettier '{src,lib,test}/**/*.{js,ts}' --write",
+        "format:fix": "npm run --silent format:write --"
     },
     "dependencies": {
         "chalk": "^5.6.2",
