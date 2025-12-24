@@ -1,8 +1,15 @@
 import { describe, expect, test } from 'vitest';
 import { LatexRenderer } from '#lib/core/markup/languages/latex';
+import { MarkupRenderer } from '#lib/core/markup/class';
 import { SlydeMarkupRenderer } from '#lib/core/markup/languages/slyde';
 
 describe('class SlydeMarkup extends MarkupRender', () => {
+  test(`is registered in the markup language registry`, () => {
+    const expected = SlydeMarkupRenderer;
+    const result = MarkupRenderer.retrieve(SlydeMarkupRenderer.name);
+    expect(expected).toBe(result);
+  });
+
   const markers = ['*', '/', '^', '_', '`', '~'] as const;
 
   const tags: Record<(typeof markers)[number], { open: string; close: string }> = {

@@ -1,8 +1,15 @@
 import { describe, expect, test } from 'vitest';
 import { LatexRenderer } from '#lib/core/markup/languages/latex';
 import { MarkdownRenderer } from '#lib/core/markup/languages/markdown';
+import { MarkupRenderer } from '#lib/core/markup/class';
 
 describe('class MarkdownRenderer extends MarkupRender', () => {
+  test(`is registered in the markup language registry`, () => {
+    const expected = MarkdownRenderer;
+    const result = MarkupRenderer.retrieve(MarkdownRenderer.name);
+    expect(expected).toBe(result);
+  });
+
   test(`rendering an empty string to see if it stays a literal`, () => {
     const input = '';
     const result = new MarkdownRenderer().render(input);

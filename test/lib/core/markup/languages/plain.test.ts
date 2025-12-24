@@ -1,7 +1,14 @@
 import { describe, expect, test } from 'vitest';
+import { MarkupRenderer } from '#lib/core/markup/class';
 import { PlainMarkupRenderer } from '#lib/core/markup/languages/plain';
 
 describe('class PlainMarkupRenderer extends MarkupRender', () => {
+  test(`is registered in the markup language registry`, () => {
+    const expected = PlainMarkupRenderer;
+    const result = MarkupRenderer.retrieve(PlainMarkupRenderer.name);
+    expect(expected).toBe(result);
+  });
+
   test(`rendering an empty string to see if it stays a literal`, () => {
     const input = '';
     const result = new PlainMarkupRenderer().render(input);
