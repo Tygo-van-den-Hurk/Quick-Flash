@@ -7,7 +7,7 @@ to get started make a file called `slyde.xml`, and put in the following text:
 </presentation>
 ```
 
-Slyde is made out of XML blocks denoted like this `<tag>...</tag>`. They are an abstract way to represent data in this case a presentation. Google them to learn more if you're not familiar. The first tag you'll need to use is the `<presentation> ... </presentation>` tag. 
+Slyde is made out of XML blocks denoted like this `<tag>...</tag>`. They are an abstract way to represent data in this case a presentation. Google `XML` to learn more if you're not familiar. The first tag you'll need to use is the `<presentation> ... </presentation>` tag. 
 
 Now in the presentation block you can add slides as you please. Add one and optionally give it a title:
 
