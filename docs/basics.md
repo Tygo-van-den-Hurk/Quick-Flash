@@ -44,7 +44,7 @@ To style text add [markup](./markup.md). For more information about how markup w
 
 This would output the following fully animated presentation:
 
-<img src="./assets/example-presentation.gif" width="100%" alt="An example Slyde presentation based on the previous example XML template">
+<img src="https://raw.githubusercontent.com/Tygo-van-den-Hurk/Slyde/main/docs/assets/example-presentation.gif" width="100%" style="border-radius:var(--radius-xl);" alt="An example Slyde presentation based on the previous example XML template">
 
 You can optionally add presentor notes using XML comments `<!-- ... -->`:
 

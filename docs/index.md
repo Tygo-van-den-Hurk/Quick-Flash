@@ -25,6 +25,6 @@ Slyde is a program to create professional beautifully animated presentations fro
 
 This would output the following fully animated presentation:
 
-<img src="./assets/example-presentation.gif" width="100%" alt="An example Slyde presentation based on the previous example XML template">
+<img src="https://raw.githubusercontent.com/Tygo-van-den-Hurk/Slyde/main/docs/assets/example-presentation.gif" width="100%" style="border-radius:var(--radius-xl);" alt="An example Slyde presentation based on the previous example XML template">
 
 To see a run down of how we made this slide [see the basics](./basics.md).
