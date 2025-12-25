@@ -45,6 +45,15 @@ jobs:
           smmap==5.0.2 colorama==0.4.6 platformdirs==4.5.1 six==1.17.0
       - name: Build site with MkDocs
         run: mkdocs --verbose --color build --site-dir ./_site
+      - name: Check the links
+        uses: lycheeverse/lychee-action@v2.6.1
+        with:
+          fail: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: >
+            ./_site --verbose --max-concurrency 1
+            --glob-ignore-case '**/*.{html,htm}'
+            --hidden --no-progress
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4.0.0
         with: { path: ./_site }
