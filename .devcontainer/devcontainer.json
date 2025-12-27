@@ -1,0 +1,11 @@
+{
+  "name": "Slyde",
+  "image": "node:24",
+  "remoteUser": "user",
+  "features": {
+    "git": "latest",
+    "gh-cli": "latest"
+  },
+  "postCreateCommand": "npm ci",
+  "workspaceFolder": "/workspace"
+}
